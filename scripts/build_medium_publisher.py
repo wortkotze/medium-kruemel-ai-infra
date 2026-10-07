@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Build the interactive 1-Click Medium Publisher & Copy-Paste Tool.
-Converts all 7 articles from medium/articles/*.md into pre-rendered, Medium-optimized HTML.
+Converts all 7 articles from medium/articles/*.md into pre-rendered, Medium-optimized HTML
+and includes Medium Publishing Tags, Subtitles, and SEO descriptions.
 """
 import os
 import json
@@ -12,38 +13,88 @@ ARTICLES_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "me
 OUTPUT_STANDALONE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "medium", "publisher.html"))
 OUTPUT_HUB = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "hub", "medium.html"))
 
-ARTICLE_FILES = [
-    ("00", "00_beyond_toy_bots_enterprise_ai_blueprint.md", "00. The Master Blueprint (5 Pillars & Architecture)"),
-    ("01", "01_slashing_90_percent_llm_costs_litellm_finops.md", "01. Slashing 90% Costs (LiteLLM & FinOps)"),
-    ("02", "02_zero_trust_prompting_pii_redaction.md", "02. Zero-Trust Prompting (PII Shield)"),
-    ("03", "03_full_stack_observability_langfuse_evals.md", "03. Full-Stack Observability (Langfuse Evals)"),
-    ("04", "04_vectors_are_not_enough_qdrant_memgraph_hybrid_memory.md", "04. Dual Memory (Qdrant + Memgraph)"),
-    ("05", "05_death_to_the_agent_monolith_docker_microworkers.md", "05. Container Mesh (Docker Micro-Workers)"),
-    ("06", "06_when_agents_sleep_continuous_self_evolution.md", "06. Self-Evolution (Nightly Reflection Cycles)")
+ARTICLE_METADATA = [
+    {
+        "id": "00",
+        "filename": "00_beyond_toy_bots_enterprise_ai_blueprint.md",
+        "title": "00. The Master Blueprint (5 Pillars & Architecture)",
+        "subtitle": "How we engineered an audited, zero-lock-in enterprise AI platform with LiteLLM, Langfuse, Memgraph, Qdrant, and LangGraph micro-workers.",
+        "seo_description": "A production-ready blueprint for building self-hosted, audited enterprise multi-agent AI infrastructure with LiteLLM, Langfuse, and Docker.",
+        "tags": ["Artificial Intelligence", "Software Engineering", "Devops", "Open Source", "System Architecture"]
+    },
+    {
+        "id": "01",
+        "filename": "01_slashing_90_percent_llm_costs_litellm_finops.md",
+        "title": "01. Slashing 90% Costs (LiteLLM & FinOps)",
+        "subtitle": "Decouple agent code from commercial AI providers, route to local GPUs ($0.00) with automatic cloud fallbacks, and enforce monthly budget caps.",
+        "seo_description": "Learn how to slash 90% of enterprise LLM expenses using LiteLLM model routing, semantic caching, and virtual key spend caps.",
+        "tags": ["Artificial Intelligence", "Finops", "Software Engineering", "Devops", "Open Source"]
+    },
+    {
+        "id": "02",
+        "filename": "02_zero_trust_prompting_pii_redaction.md",
+        "title": "02. Zero-Trust Prompting (PII Shield)",
+        "subtitle": "Why local LLMs alone are not a silver bullet for data privacy, and how to build automatic PII redaction and audit trails into your gateway.",
+        "seo_description": "Implement real-time PII redaction, secret scanning, and GDPR compliance for enterprise AI prompts before data leaves your network.",
+        "tags": ["Cybersecurity", "Artificial Intelligence", "Data Privacy", "Software Engineering", "Information Security"]
+    },
+    {
+        "id": "03",
+        "filename": "03_full_stack_observability_langfuse_evals.md",
+        "title": "03. Full-Stack Observability (Langfuse Evals)",
+        "subtitle": "Why traditional logs fail for multi-agent loops, and how to audit every tool call, latency bottleneck, and token spend in ClickHouse and Langfuse.",
+        "seo_description": "Achieve full-stack observability and automated evaluation for LangGraph multi-agent systems using Langfuse and ClickHouse.",
+        "tags": ["Observability", "Artificial Intelligence", "Devops", "Software Development", "Monitoring"]
+    },
+    {
+        "id": "04",
+        "filename": "04_vectors_are_not_enough_qdrant_memgraph_hybrid_memory.md",
+        "title": "04. Dual Memory (Qdrant + Memgraph)",
+        "subtitle": "Merging semantic fuzzy search with relational graph traversals (Memgraph) to eliminate hallucinations and context window explosions.",
+        "seo_description": "Why vector embeddings fail on multi-hop questions, and how dual memory with Qdrant and Memgraph powers accurate GraphRAG agents.",
+        "tags": ["Knowledge Graph", "Artificial Intelligence", "Databases", "Software Architecture", "Data Science"]
+    },
+    {
+        "id": "05",
+        "filename": "05_death_to_the_agent_monolith_docker_microworkers.md",
+        "title": "05. Container Mesh (Docker Micro-Workers)",
+        "subtitle": "How we decoupled 5 LangGraph agents into sandboxed micro-workers, secured them with least-privilege mounts, and orchestrated live SSE streaming.",
+        "seo_description": "Stop running monolithic Python agent scripts. Learn how to containerize LangGraph agents with Docker and least-privilege security.",
+        "tags": ["Docker", "Devops", "Software Architecture", "Artificial Intelligence", "Microservices"]
+    },
+    {
+        "id": "06",
+        "filename": "06_when_agents_sleep_continuous_self_evolution.md",
+        "title": "06. Self-Evolution (Nightly Reflection Cycles)",
+        "subtitle": "Why hardcoded system prompts are a dead end, and how we built a closed-loop self-evolution architecture with Langfuse traces and episodic memory.",
+        "seo_description": "Build autonomous agents that learn from operational failures, reflect during sleep loops, and continuously evolve their prompts and tools.",
+        "tags": ["Artificial Intelligence", "Machine Learning", "Software Engineering", "Autonomous Agents", "Tech Trends"]
+    }
 ]
 
 def md_to_clean_html(md_text):
-    # Ensure raw markdown is converted with fenced code blocks & clean tables
     html = markdown.markdown(md_text, extensions=['extra', 'sane_lists', 'nl2br'])
     return html
 
 def main():
     articles_data = []
     
-    for idx, fname, title in ARTICLE_FILES:
-        fpath = os.path.join(ARTICLES_DIR, fname)
+    for item in ARTICLE_METADATA:
+        fpath = os.path.join(ARTICLES_DIR, item["filename"])
         if not os.path.exists(fpath):
             print(f"Warning: {fpath} not found")
             continue
         with open(fpath, "r", encoding="utf-8") as f:
             raw_md = f.read()
         
-        # Convert to clean HTML
         rendered_html = md_to_clean_html(raw_md)
         articles_data.append({
-            "id": idx,
-            "filename": fname,
-            "title": title,
+            "id": item["id"],
+            "filename": item["filename"],
+            "title": item["title"],
+            "subtitle": item["subtitle"],
+            "seo_description": item["seo_description"],
+            "tags": item["tags"],
             "raw_md": raw_md,
             "html": rendered_html
         })
@@ -93,7 +144,7 @@ def main():
             position: sticky;
             top: 0;
             z-index: 50;
-            background: rgba(9, 9, 11, 0.85);
+            background: rgba(9, 9, 11, 0.88);
             backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border);
             padding: 0.85rem 2rem;
@@ -172,10 +223,6 @@ def main():
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
         }
 
-        .btn-copy:active {
-            transform: translateY(1px);
-        }
-
         .btn-outline {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -218,13 +265,106 @@ def main():
         main {
             flex: 1;
             display: flex;
-            justify-content: center;
-            padding: 2.5rem 1.5rem 5rem 1.5rem;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1.5rem 5rem 1.5rem;
+            gap: 1.5rem;
+        }
+
+        /* Publication Metadata Box (Tags, Subtitle, SEO) */
+        .meta-card {
+            width: 100%;
+            max-width: 820px;
+            background: #111116;
+            border: 1px solid #27272f;
+            border-radius: 12px;
+            padding: 1.4rem 1.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .meta-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .meta-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #a1a1aa;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tag-chip {
+            background: rgba(59, 130, 246, 0.12);
+            color: #93c5fd;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            user-select: all;
+        }
+
+        .btn-copy-sm {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: #e4e4e7;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 0.3rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .btn-copy-sm:hover {
+            border-color: var(--accent-blue);
+            color: #60a5fa;
+        }
+
+        .meta-row {
+            font-size: 0.86rem;
+            line-height: 1.5;
+            color: #d4d4d8;
+            background: #18181f;
+            padding: 0.65rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #272733;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .meta-row span strong {
+            color: #fff;
+            margin-right: 0.4rem;
         }
 
         .article-container {
             width: 100%;
-            max-width: 780px;
+            max-width: 820px;
             background: var(--bg-surface);
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -408,11 +548,29 @@ def main():
     </header>
 
     <div class="info-strip">
-        <span>💡 <strong>How it works:</strong> Click <em>"1-Click Copy for Medium"</em>, switch to Medium's story editor, and press <strong>Cmd+V</strong>. Headings, code blocks, bullet points, and images will render natively!</span>
+        <span>💡 <strong>Publishing flow:</strong> Click <em>"1-Click Copy for Medium"</em>, switch to Medium editor, press <strong>Cmd+V</strong>, and use the recommended 5 tags below when publishing!</span>
         <span>Images hosted on: <a href="https://github.com/wortkotze/medium-kruemel-ai-infra" target="_blank">github.com/wortkotze/medium-kruemel-ai-infra</a></span>
     </div>
 
     <main>
+        <!-- Metadata & Recommended Tags Box -->
+        <div class="meta-card">
+            <div class="meta-header">
+                <span class="meta-title">🏷️ Recommended Medium Tags (Max 5 allowed):</span>
+                <button class="btn-copy-sm" onclick="copyCurrentTags()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                    Copy All 5 Tags
+                </button>
+            </div>
+            <div id="tagsContainer" class="tags-container">
+                <!-- Tag chips inserted dynamically -->
+            </div>
+            <div class="meta-row">
+                <span id="subtitleText"><strong>Subtitle:</strong> ...</span>
+                <button class="btn-copy-sm" onclick="copySubtitle()">Copy Subtitle</button>
+            </div>
+        </div>
+
         <div class="article-container">
             <div id="renderedArticle" class="rendered-content">
                 <!-- active article HTML injected here -->
@@ -430,8 +588,12 @@ def main():
 
         const selectEl = document.getElementById('articleSelect');
         const containerEl = document.getElementById('renderedArticle');
+        const tagsContainerEl = document.getElementById('tagsContainer');
+        const subtitleTextEl = document.getElementById('subtitleText');
         const toastEl = document.getElementById('toast');
         const toastMsgEl = document.getElementById('toastMsg');
+
+        let currentArticleIdx = 0;
 
         // Populate dropdown
         articles.forEach((art, idx) => {
@@ -441,11 +603,24 @@ def main():
             selectEl.appendChild(opt);
         });
 
-        // Load initial article
+        // Load article
         function switchArticle(idx) {
+            currentArticleIdx = idx;
             const current = articles[idx];
             if (!current) return;
+            
             containerEl.innerHTML = current.html;
+            subtitleTextEl.innerHTML = `<strong>Subtitle:</strong> ${current.subtitle}`;
+
+            // Render tags
+            tagsContainerEl.innerHTML = '';
+            current.tags.forEach(tag => {
+                const chip = document.createElement('span');
+                chip.className = 'tag-chip';
+                chip.textContent = tag;
+                tagsContainerEl.appendChild(chip);
+            });
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -459,13 +634,26 @@ def main():
             }, 3500);
         }
 
+        async function copyCurrentTags() {
+            const current = articles[currentArticleIdx];
+            if (!current) return;
+            const tagsStr = current.tags.join(', ');
+            await navigator.clipboard.writeText(tagsStr);
+            showToast(`🏷️ Copied 5 tags: ${tagsStr}`);
+        }
+
+        async function copySubtitle() {
+            const current = articles[currentArticleIdx];
+            if (!current) return;
+            await navigator.clipboard.writeText(current.subtitle);
+            showToast("📝 Subtitle copied to clipboard!");
+        }
+
         async function copyForMedium() {
             try {
-                // Get clean HTML content
                 const htmlContent = containerEl.innerHTML;
                 const textContent = containerEl.innerText;
 
-                // Modern Clipboard API supporting text/html (Rich Text)
                 const blobHtml = new Blob([htmlContent], { type: 'text/html' });
                 const blobText = new Blob([textContent], { type: 'text/plain' });
                 const item = new ClipboardItem({
@@ -477,7 +665,6 @@ def main():
                 showToast("✨ Rich Text copied! Switch to Medium and press Cmd+V.");
             } catch (err) {
                 console.warn("ClipboardItem API failed, falling back to selection copy:", err);
-                // Fallback: Select node contents and copy as Rich Text
                 const range = document.createRange();
                 range.selectNodeContents(containerEl);
                 const sel = window.getSelection();
@@ -495,12 +682,10 @@ def main():
 
     final_html = template.replace("__ARTICLES_DATA_PLACEHOLDER__", articles_json)
 
-    # Write standalone file
     with open(OUTPUT_STANDALONE, "w", encoding="utf-8") as f:
         f.write(final_html)
     print(f"Generated standalone publisher: {OUTPUT_STANDALONE}")
 
-    # Write hub file
     with open(OUTPUT_HUB, "w", encoding="utf-8") as f:
         f.write(final_html)
     print(f"Generated hub page: {OUTPUT_HUB}")
