@@ -47,4 +47,19 @@ Write an in-depth, practical technical Medium article in English focused on Hybr
 - Why GraphRAG prevents expensive, bloated context window dumps.
 - How to extract nodes and edges from repositories and documentation into Memgraph automatically.
 - The Architectural Rule of Thumb: When data belongs in Qdrant vs. when it belongs in Memgraph.
+
+---
+
+## Official GitHub Repositories & Visual Design Reference
+Always include links to the live, working codebases:
+- **Infrastructure & Platform:** [https://github.com/wortkotze/medium-kruemel-ai-infra](https://github.com/wortkotze/medium-kruemel-ai-infra)
+- **Multi-Agent Application Mesh:** [https://github.com/wortkotze/medium-kruemel-ai-agents](https://github.com/wortkotze/medium-kruemel-ai-agents)
+
+**Visual Schema & Diagram Styling:**
+- All architecture and workflow diagrams must adhere to the **Krümel AI Cyber-Slate Design System**:
+  - Canvas / Background: `#09090b` (Deep Slate)
+  - Card & Node Surfaces: `#111115` with 1px border `#27272a`
+  - Accent Traffic / Gateways: `#3b82f6` (Electric Blue)
+  - Accent Data / Agents: `#10b981` (Emerald Green)
+
 ```

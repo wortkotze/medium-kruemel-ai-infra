@@ -58,4 +58,19 @@ Write an in-depth, hands-on technical Medium article in English focused on slash
 - Why direct API calls in agent graphs are a dangerous enterprise anti-pattern.
 - How local-first routing combined with transparent cloud fallbacks saves up to 90% in inference costs.
 - How virtual keys bring multi-tenant cost accountability and auditability to enterprise AI stacks.
+
+---
+
+## Official GitHub Repositories & Visual Design Reference
+Always include links to the live, working codebases:
+- **Infrastructure & Platform:** [https://github.com/wortkotze/medium-kruemel-ai-infra](https://github.com/wortkotze/medium-kruemel-ai-infra)
+- **Multi-Agent Application Mesh:** [https://github.com/wortkotze/medium-kruemel-ai-agents](https://github.com/wortkotze/medium-kruemel-ai-agents)
+
+**Visual Schema & Diagram Styling:**
+- All architecture and workflow diagrams must adhere to the **Krümel AI Cyber-Slate Design System**:
+  - Canvas / Background: `#09090b` (Deep Slate)
+  - Card & Node Surfaces: `#111115` with 1px border `#27272a`
+  - Accent Traffic / Gateways: `#3b82f6` (Electric Blue)
+  - Accent Data / Agents: `#10b981` (Emerald Green)
+
 ```

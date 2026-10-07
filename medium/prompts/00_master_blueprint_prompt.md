@@ -47,10 +47,32 @@ Embed the following screenshot placeholder with clear captioning:
 
 ---
 
+## Official Open-Source Repositories (Include in Article & Call-to-Actions)
+Explicitly link readers to the production-ready codebases:
+- **Platform & Infrastructure:** [https://github.com/wortkotze/medium-kruemel-ai-infra](https://github.com/wortkotze/medium-kruemel-ai-infra)
+- **Multi-Agent Application Mesh:** [https://github.com/wortkotze/medium-kruemel-ai-agents](https://github.com/wortkotze/medium-kruemel-ai-agents)
+
+Include the quickstart snippet for readers:
+```bash
+git clone https://github.com/wortkotze/medium-kruemel-ai-infra.git
+git clone https://github.com/wortkotze/medium-kruemel-ai-agents.git
+cd medium-kruemel-ai-infra && make start && make agents-up
+```
+
+---
+
+## Visual Design Schema & Diagram Guidelines
+Follow the **Krümel AI Visual Identity** for all diagrams:
+- **Dark-Mode Aesthetic:** Deep Slate canvas (`#09090b`), dark card containers (`#111115`), subtle 1px border (`#27272a`).
+- **Brand Accents:** Electric Blue (`#3b82f6`) for Gateway/Traffic, Emerald Green (`#10b981`) for Agents/Data stores, Amber (`#f59e0b`) for fallbacks.
+- **Mermaid Diagrams:** Include styled nodes matching this cyber-minimalist dark theme.
+
+---
+
 ## Technical Deep-Dives to Cover in Detail
 1. **The Dual-Repository Clean Architecture:**
-   - `medium-kruemel-ai-infra`: Orchestrates the platform (Docker Compose, LiteLLM gateway, observability, memory engines, MCP servers).
-   - `medium-kruemel-ai-agents`: Pure LangGraph agent logic, tool implementations, and worker runtimes.
+   - [medium-kruemel-ai-infra](https://github.com/wortkotze/medium-kruemel-ai-infra): Orchestrates the platform (Docker Compose, LiteLLM gateway, observability, memory engines, MCP servers).
+   - [medium-kruemel-ai-agents](https://github.com/wortkotze/medium-kruemel-ai-agents): Pure LangGraph agent logic, tool implementations, and worker runtimes.
 2. **The 5 Autonomous Roles:**
    - `agent-po`: PRDs, User Stories, structured specifications in `/workspace/docs/specs`.
    - `agent-architect`: Architecture Decision Records (ADRs), system boundaries, Memgraph graph queries.
