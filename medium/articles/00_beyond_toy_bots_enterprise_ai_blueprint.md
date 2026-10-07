@@ -4,7 +4,7 @@
 
 ---
 
-![The Krümel AI 3D Enterprise Architecture](../images/00_master_blueprint_hero.jpg)
+![The Krümel AI 3D Enterprise Architecture](https://raw.githubusercontent.com/wortkotze/medium-kruemel-ai-infra/main/medium/images/00_master_blueprint_hero.jpg)
 *Figure 1: The Krümel AI 3D Enterprise Topology — A central gateway routing requests across isolated containerized micro-workers backed by dual-layer vector and graph memory.*
 
 ---
@@ -32,13 +32,16 @@ In this article, we unveil the complete architecture of **Krümel AI**: a fully 
 
 To transition from brittle prototype scripts to an enterprise-grade platform, an architecture must satisfy five foundational pillars:
 
-| Capability | Enterprise Requirement | Open-Source Solution |
-| :--- | :--- | :--- |
-| **1. Model Gateway & FinOps** | Decoupled routing, local-first inference ($0.00), automatic cloud fallbacks, virtual keys with hard spend caps. | **LiteLLM Proxy** |
-| **2. Zero-Trust Data Security** | Real-time PII masking, secret detection, and deterministic pseudonymization before prompts leave the perimeter. | **Gateway Interceptor & Presidio** |
-| **3. Full-Stack Observability** | Hierarchical trace trees tracking every token, latency bottleneck, tool execution, and automated evaluation score. | **Langfuse (ClickHouse + Postgres)** |
-| **4. Dual-Layer Memory** | Dense semantic similarity matching combined with structured relational knowledge graph traversals. | **Qdrant + Memgraph (GraphRAG)** |
-| **5. Isolated Agent Mesh** | Independent, resource-capped containerized micro-workers adhering strictly to the Principle of Least Privilege. | **LangGraph + Docker Bridge** |
+* **1. Model Gateway & FinOps (LiteLLM Proxy)**  
+  Decoupled routing, local-first inference ($0.00), automatic cloud fallbacks, and virtual keys with hard spend caps.
+* **2. Zero-Trust Data Security (Gateway Interceptor & Presidio)**  
+  Real-time PII masking, secret detection, and deterministic pseudonymization before prompts leave the perimeter.
+* **3. Full-Stack Observability (Langfuse ClickHouse Engine)**  
+  Hierarchical trace trees tracking every token, latency bottleneck, tool execution, and automated evaluation score.
+* **4. Dual-Layer Memory (Qdrant + Memgraph)**  
+  Dense semantic similarity matching combined with structured relational knowledge graph traversals.
+* **5. Isolated Agent Mesh (LangGraph + Docker Bridge)**  
+  Independent, resource-capped containerized micro-workers adhering strictly to the Principle of Least Privilege.
 
 ---
 
@@ -50,46 +53,28 @@ The entire platform is organized into two cleanly separated repositories:
 
 Here is how traffic flows through the ecosystem:
 
-```mermaid
-%%{init: {
-  'theme': 'base',
-  'themeVariables': {
-    'darkMode': true,
-    'background': '#09090b',
-    'primaryColor': '#111115',
-    'primaryTextColor': '#fafafa',
-    'primaryBorderColor': '#3b82f6',
-    'lineColor': '#10b981',
-    'secondaryColor': '#18181b',
-    'tertiaryColor': '#09090b',
-    'fontFamily': 'Inter, system-ui, sans-serif'
-  }
-}}%%
-graph TD
-    User["End User / Browser"] -->|Port 1513| OWUI["Open WebUI Chat Suite"]
-    OWUI -->|OpenAI SSE /v1/chat/completions| GW["Central Agent Gateway (:1518)"]
-    
-    subgraph Routing & Security
-        GW -->|Model Dispatch| LLM["LiteLLM Proxy (:4000)"]
-        LLM -->|Virtual Key Spend Caps| DB[(PostgreSQL & Redis)]
-        LLM -->|Hierarchical Traces| LF["Langfuse (:3000)<br/>ClickHouse Engine"]
-    end
-
-    subgraph Containerized Micro-Workers [:8001]
-        GW -->|HTTP Stream| PO["kruemel-agent-po"]
-        GW -->|HTTP Stream| ARCH["kruemel-agent-architect"]
-        GW -->|HTTP Stream| DEV["kruemel-agent-coder"]
-        GW -->|HTTP Stream| RES["kruemel-agent-researcher"]
-        GW -->|HTTP Stream| OPS["kruemel-agent-devops"]
-    end
-
-    subgraph Memory & Air-Gapped Tooling
-        PO & ARCH & OPS -.->|Graph Traversals| MEM[("Memgraph (:7687)")]
-        PO & DEV & RES -.->|Dense Embeddings| QD[("Qdrant (:6333)")]
-        RES -.-> SEARX["SearXNG Meta-Search (:1514)"]
-        DEV -.-> SANDBOX["Isolated Code Sandbox (:1517)"]
-        OPS -.-> DOCKER["/var/run/docker.sock (ro)"]
-    end
+```text
+[ Browser / End User ]
+         │ (Port 1513)
+         ▼
+[ Open WebUI Chat Suite ]
+         │ (OpenAI SSE /v1/chat/completions)
+         ▼
+[ Central Agent Gateway (:1518) ]
+   │
+   ├──► [ Model Router & FinOps (:4000) ]
+   │     ├── LiteLLM Proxy (Local Models & Cloud Failover)
+   │     ├── PostgreSQL (Virtual Key Quotas & Spend Caps)
+   │     └── Langfuse (:3000) Tracing & Token Analytics
+   │
+   ├──► [ Isolated Micro-Worker Mesh (:8001 - :8005) ]
+   │     ├── kruemel-agent-po        ──► Memgraph Knowledge Graph (:7687)
+   │     ├── kruemel-agent-architect ──► Memgraph Knowledge Graph (:7687)
+   │     ├── kruemel-agent-coder     ──► Qdrant Vector DB & Sandbox (:1517)
+   │     ├── kruemel-agent-researcher──► Qdrant & SearXNG Search (:1514)
+   │     └── kruemel-agent-devops    ──► Docker Engine API (Read-Only)
+   │
+   └──► [ Streaming SSE Response Back to Client ]
 ```
 
 ---
@@ -98,7 +83,7 @@ graph TD
 
 Rather than building a single monolithic agent that attempts to perform all tasks poorly, Krümel AI decomposes enterprise software delivery into **five specialized autonomous roles**:
 
-![Krümel AI Agent Status Cockpit](../screenshots/02_agent_cockpit_online_status.png)
+![Krümel AI Agent Status Cockpit](https://raw.githubusercontent.com/wortkotze/medium-kruemel-ai-infra/main/medium/screenshots/02_agent_cockpit_online_status.png)
 *Figure 2: The Krümel Hub Cockpit — Live operational status displaying all five agent micro-workers registered and online.*
 
 ### 1. Product Owner & Requirements Agent (`agent-po`)
@@ -179,7 +164,7 @@ However, vector embeddings fail catastrophically when presented with **relationa
 
 Vectors have no concept of directed edges, foreign keys, or multi-hop traversals.
 
-![Dual AI Memory Architecture](../images/04_hybrid_memory_qdrant_memgraph.jpg)
+![Dual AI Memory Architecture](https://raw.githubusercontent.com/wortkotze/medium-kruemel-ai-infra/main/medium/images/04_hybrid_memory_qdrant_memgraph.jpg)
 *Figure 3: Dual-Layer Memory — Dense semantic vector clustering in Qdrant combined with relational property graph traversals in Memgraph.*
 
 To solve this, Krümel AI implements a **Dual-Brain Architecture**:
@@ -233,3 +218,15 @@ This blueprint provides the high-level roadmap. Over the next six weeks, we will
 Star the repositories on GitHub to follow along with the code releases:
 * ⭐️ **Infrastructure Stack:** [https://github.com/wortkotze/medium-kruemel-ai-infra](https://github.com/wortkotze/medium-kruemel-ai-infra)
 * ⭐️ **Autonomous Agent Mesh:** [https://github.com/wortkotze/medium-kruemel-ai-agents](https://github.com/wortkotze/medium-kruemel-ai-agents)
+
+---
+
+```text
+> Initiating ArticleProtocol...
+> Loading Human Ideas... [100% Complete]
+> Loading AI Grammar... [100% Complete]
+> Merging... Success.
+> Disclaimer: Content architected by a human, compiled by an agent
+> Disclaimer: Graphics generated by an agent
+```
+
