@@ -48,9 +48,13 @@ Write an in-depth, hands-on technical Medium article in English focused on slash
 
 ---
 
-## Screenshot Integration
-`![Krümel AI Hub Landing Page with central Gateway and Proxy integration](medium/screenshots/01_kruemel_hub_overview.png)`
-*Caption: "Centralized Gateway Architecture: LiteLLM manages virtual keys, budget quotas, and routing rules centrally for all containerized agents."*
+
+## Featured 3D Architecture Visual
+Embed this official pre-rendered high-res 3D graphic in the article:
+`![The LiteLLM FinOps Router: Zero-cost local inference on the green track with automatic fallback to cloud models and virtual key budget protection.](medium/images/01_litellm_finops_router.jpg)`
+*Caption: "The LiteLLM FinOps Router: Zero-cost local inference on the green track with automatic fallback to cloud models and virtual key budget protection."*
+
+**CRITICAL INSTRUCTION:** Do NOT draw ASCII art or excessive text boxes in the text. Refer directly to the high-resolution 3D illustration above!
 
 ---
 

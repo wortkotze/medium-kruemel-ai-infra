@@ -97,3 +97,17 @@ Whenever referring to the open-source code in Medium articles, use these canonic
   `https://github.com/wortkotze/medium-kruemel-ai-infra`
 * **Autonomous Multi-Agent Application Layer:**  
   `https://github.com/wortkotze/medium-kruemel-ai-agents`
+
+---
+
+## 🖼️ 6. Pre-Rendered Enterprise 3D Asset Library (`medium/images/`)
+
+All 7 articles come with pre-rendered, photorealistic 8K 3D isometric illustrations in the official Krümel Cyber-Slate aesthetic:
+
+1. **`00_master_blueprint_hero.jpg`** – Master Blueprint: Central glowing AI gateway distributing neural streams to 5 containerized agent nodes backed by vector and graph matrices.
+2. **`01_litellm_finops_router.jpg`** – FinOps Router: Zero-cost local inference track vs. cloud fallbacks with virtual key spend protection chips.
+3. **`02_zerotrust_pii_shield.jpg`** – Zero-Trust PII Shield: Real-time interception and pseudonymization of sensitive financial/personal data.
+4. **`03_langfuse_observability_traces.jpg`** – Observability Console: Hierarchical trace tree, latency graphs, and ClickHouse columnar stream.
+5. **`04_hybrid_memory_qdrant_memgraph.jpg`** – Dual-Layer Memory: Dense Qdrant vector point-cloud paired with Memgraph relational knowledge network.
+6. **`05_microworker_docker_mesh.jpg`** – Container Mesh: 5 isolated micro-worker pods with least-privilege firewalls around a central dispatch event router.
+7. **`06_agent_reflection_evolution.jpg`** – Continuous Evolution: Autonomous agent sleep cycle consolidating errors into distilled lessons and synthesized skills.

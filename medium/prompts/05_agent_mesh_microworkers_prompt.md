@@ -55,12 +55,13 @@ Write an in-depth, hands-on technical Medium article in English focused on break
 
 ---
 
-## Screenshot Integration
-`![The Agent Cockpit in Krümel Hub showing all 5 micro-workers in ONLINE state](medium/screenshots/02_agent_cockpit_online_status.png)`
-*Caption: "Sandboxed Micro-Workers: Each agent runs in its own container with strict volume isolation and automated heartbeat discovery."*
 
-`![Open WebUI Chat Suite with all 5 specialized models](medium/screenshots/03_open_webui_chat.png)`
-*Caption: "Fluid End-User Experience: Users interact with specialized agents via Open WebUI with real-time SSE token streaming."*
+## Featured 3D Architecture Visual
+Embed this official pre-rendered high-res 3D graphic in the article:
+`![Isolated Container Mesh: 5 autonomous micro-workers running in Docker containers with least-privilege volume scoping around a central event router.](medium/images/05_microworker_docker_mesh.jpg)`
+*Caption: "Isolated Container Mesh: 5 autonomous micro-workers running in Docker containers with least-privilege volume scoping around a central event router."*
+
+**CRITICAL INSTRUCTION:** Do NOT draw ASCII art or excessive text boxes in the text. Refer directly to the high-resolution 3D illustration above!
 
 ---
 
