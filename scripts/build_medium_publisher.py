@@ -312,15 +312,37 @@ def main():
         .tag-chip {
             background: rgba(59, 130, 246, 0.12);
             color: #93c5fd;
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            font-size: 0.82rem;
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            font-size: 0.85rem;
             font-weight: 600;
-            padding: 0.35rem 0.75rem;
+            padding: 0.4rem 0.85rem;
             border-radius: 20px;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 0.3rem;
-            user-select: all;
+            gap: 0.45rem;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            font-family: inherit;
+        }
+
+        .tag-chip:hover {
+            background: rgba(59, 130, 246, 0.25);
+            border-color: #3b82f6;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .tag-chip:active {
+            transform: translateY(1px);
+        }
+
+        .tag-chip .tag-num {
+            background: rgba(255, 255, 255, 0.12);
+            font-size: 0.72rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 10px;
+            color: #e4e4e7;
         }
 
         .btn-copy-sm {
@@ -556,11 +578,8 @@ def main():
         <!-- Metadata & Recommended Tags Box -->
         <div class="meta-card">
             <div class="meta-header">
-                <span class="meta-title">🏷️ Recommended Medium Tags (Max 5 allowed):</span>
-                <button class="btn-copy-sm" onclick="copyCurrentTags()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                    Copy All 5 Tags
-                </button>
+                <span class="meta-title">🏷️ Recommended Medium Tags (Click any tag to copy):</span>
+                <span style="font-size:0.78rem;color:#a1a1aa;background:rgba(255,255,255,0.05);padding:0.25rem 0.6rem;border-radius:6px;">⚠️ Paste each tag individually & press Enter in Medium</span>
             </div>
             <div id="tagsContainer" class="tags-container">
                 <!-- Tag chips inserted dynamically -->
@@ -612,12 +631,14 @@ def main():
             containerEl.innerHTML = current.html;
             subtitleTextEl.innerHTML = `<strong>Subtitle:</strong> ${current.subtitle}`;
 
-            // Render tags
+            // Render tags as individual 1-click buttons
             tagsContainerEl.innerHTML = '';
-            current.tags.forEach(tag => {
-                const chip = document.createElement('span');
+            current.tags.forEach((tag, i) => {
+                const chip = document.createElement('button');
                 chip.className = 'tag-chip';
-                chip.textContent = tag;
+                chip.innerHTML = `<span class="tag-num">${i + 1}</span> <span>${tag}</span>`;
+                chip.title = `Click to copy "${tag}"`;
+                chip.onclick = () => copySingleTag(tag);
                 tagsContainerEl.appendChild(chip);
             });
 
@@ -625,6 +646,11 @@ def main():
         }
 
         switchArticle(0);
+
+        async function copySingleTag(tag) {
+            await navigator.clipboard.writeText(tag);
+            showToast(`🏷️ Copied "${tag}"! Switch to Medium, paste & press Enter.`);
+        }
 
         function showToast(msg) {
             toastMsgEl.textContent = msg;
