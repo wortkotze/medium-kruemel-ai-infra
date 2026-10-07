@@ -1,0 +1,50 @@
+{
+  "version": "1.0.0",
+  "gateway": {
+    "url": "http://localhost:4000",
+    "master_key": "sk-dummy-master-key-change-me"
+  },
+  "roles": {
+    "agent-po": {
+      "model": "local-general",
+      "key_alias": "kruemel-agent-po",
+      "token": "dummy-token-agent-po",
+      "tools": ["spec_mcp", "qdrant_mcp", "memgraph_mcp"]
+    },
+    "agent-architect": {
+      "model": "local-general",
+      "key_alias": "kruemel-agent-architect",
+      "token": "dummy-token-agent-architect",
+      "tools": ["architecture_mcp", "spec_mcp", "qdrant_mcp", "memgraph_mcp"]
+    },
+    "agent-coder": {
+      "model": "local-coder",
+      "key_alias": "kruemel-agent-coder",
+      "token": "dummy-token-agent-coder",
+      "tools": ["filesystem_mcp", "sandbox_mcp", "github_mcp", "qdrant_mcp"]
+    },
+    "agent-researcher": {
+      "model": "local-general",
+      "key_alias": "kruemel-agent-researcher",
+      "token": "dummy-token-agent-researcher",
+      "tools": ["searxng_mcp", "browserless_mcp", "qdrant_mcp"]
+    },
+    "agent-devops": {
+      "model": "local-general",
+      "key_alias": "kruemel-agent-devops",
+      "token": "dummy-token-agent-devops",
+      "tools": ["docker_mcp", "litellm_mcp", "cloudflare_mcp", "fritzbox_mcp", "qdrant_mcp", "memgraph_mcp"]
+    }
+  },
+  "endpoints": {
+    "searxng": "http://localhost:1514",
+    "memgraph_bolt": "bolt://localhost:7687",
+    "memgraph_lab": "http://localhost:1515",
+    "browserless": "http://localhost:1516",
+    "sandbox": "http://localhost:1517",
+    "qdrant": "http://localhost:6333",
+    "langfuse": "http://localhost:3000",
+    "hub": "http://localhost:1512",
+    "agent_gateway": "http://localhost:1518"
+  }
+}

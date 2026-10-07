@@ -1,0 +1,23 @@
+# ──────────────────────────────────────────────
+# LiteLLM Proxy – Master Gateway Configuration
+# ──────────────────────────────────────────────
+# Sub-configurations are located in the config/ directory.
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+  sub_configs:
+    - /app/config/models.yaml
+    - /app/config/mcp_servers.yaml
+    - /app/config/agents.yaml
+  proxy_admin_ui: true
+
+litellm_settings:
+  drop_params: true
+  set_verbose: false
+  num_retries: 2
+  request_timeout: 120
+  success_callback:
+    - langfuse
+  failure_callback:
+    - langfuse

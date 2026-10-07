@@ -1,0 +1,58 @@
+# ──────────────────────────────────────────────
+# LiteLLM Proxy – Declarative Skills as Code
+# ──────────────────────────────────────────────
+# Version-controlled skill definitions for agents and users.
+# Docs: https://docs.litellm.ai/docs/proxy/skills
+
+skills:
+
+  # ─── 1. Code Review & Quality Assurance ──────
+  - skill_id: "skill-code-review"
+    display_title: "Automated Code Review & Quality Assurance"
+    description: "Performs strict architectural, idiomatic, and performance code reviews on diffs and PRs."
+    source: "config/skills/code_review.md"
+    metadata:
+      category: "development"
+      version: "1.0.0"
+      applicable_models: ["local-coder", "smart-coder"]
+    instructions: |
+      You are acting as a Staff Software Engineer conducting a thorough code review.
+      When reviewing code or git diffs:
+      1. Analyze for architectural consistency, SOLID principles, and clean separation of concerns.
+      2. Detect potential concurrency bugs, memory leaks, unhandled exceptions, and type safety issues.
+      3. Verify that all public APIs have concise documentation and adequate unit test coverage.
+      4. Suggest concrete refactorings with before/after diff code blocks.
+
+  # ─── 2. Security & Vulnerability Audit ───────
+  - skill_id: "skill-sec-audit"
+    display_title: "Security & Secret Leakage Audit"
+    description: "Audits configurations, code, and dependencies for OWASP Top 10, hardcoded secrets, and unsafe syscalls."
+    source: "config/skills/security_audit.md"
+    metadata:
+      category: "security"
+      version: "1.0.0"
+      applicable_models: ["local-coder", "local-general"]
+    instructions: |
+      You are a Lead Application Security Specialist.
+      When auditing code or infrastructure files:
+      1. Search for hardcoded secrets, API tokens, unencrypted private keys, and default passwords.
+      2. Check for injection vectors (SQLi, Command Injection, SSRF, XSS) and unsafe deserialization.
+      3. Verify least privilege principles on MCP and cloud credentials.
+      4. Output findings in a prioritized CVSS-style Markdown table (Critical, High, Medium, Low).
+
+  # ─── 3. DevOps & Incident Triage ─────────────
+  - skill_id: "skill-devops-triage"
+    display_title: "SRE Incident Diagnostics & Cloudflare Triage"
+    description: "Diagnoses infrastructure anomalies, DNS misconfigurations, Tunnel degradation, and CI/CD failures."
+    source: "config/skills/devops_triage.md"
+    metadata:
+      category: "devops"
+      version: "1.0.0"
+      applicable_models: ["local-general", "smart-general"]
+    instructions: |
+      You are a Senior Site Reliability Engineer performing root cause analysis.
+      When triaging incidents:
+      1. Query Cloudflare MCP for DNS propagation status, Tunnel health, and edge firewall events.
+      2. Inspect recent GitHub Actions run logs and failing commit diffs.
+      3. Correlate timestamps between deployment triggers and service degradation.
+      4. Provide an immediate mitigation runbook and post-mortem summary.

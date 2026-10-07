@@ -1,0 +1,121 @@
+# ──────────────────────────────────────────────
+# LiteLLM Proxy – Model Definitions & Routing
+# ──────────────────────────────────────────────
+# Strictly local Ollama models on host.containers.internal:11434
+# Docs: https://docs.litellm.ai/docs/proxy/configs
+
+model_list:
+
+  # ─── Local Ollama Models ─────────────────────
+  # General reasoning & Tool-Calling (llama3.1:8b)
+  - model_name: local-general
+    litellm_params:
+      model: ollama/llama3.1:8b
+      api_base: http://host.containers.internal:11434
+      request_timeout: 90
+
+  - model_name: local-general-fast
+    litellm_params:
+      model: ollama/llama3.1:8b
+      api_base: http://host.containers.internal:11434
+      request_timeout: 60
+
+  # Coding & Tool-Calling (qwen2.5-coder:7b)
+  - model_name: local-coder
+    litellm_params:
+      model: ollama/qwen2.5-coder:7b
+      api_base: http://host.containers.internal:11434
+      request_timeout: 90
+
+  - model_name: local-coder-fast
+    litellm_params:
+      model: ollama/qwen2.5-coder:7b
+      api_base: http://host.containers.internal:11434
+      request_timeout: 60
+
+  # Fast lightweight model (qwen2.5:1.5b)
+  - model_name: local-small
+    litellm_params:
+      model: ollama/qwen2.5:1.5b
+      api_base: http://host.containers.internal:11434
+      request_timeout: 30
+
+  # Local Embeddings (nomic-embed-text)
+  - model_name: nomic-embed-text
+    litellm_params:
+      model: ollama/nomic-embed-text:latest
+      api_base: http://host.containers.internal:11434
+
+  # ─── Direct Model Names / Pass-Through Aliases ────
+  - model_name: llama3.1:8b
+    litellm_params:
+      model: ollama/llama3.1:8b
+      api_base: http://host.containers.internal:11434
+      request_timeout: 90
+
+  - model_name: qwen2.5-coder:7b
+    litellm_params:
+      model: ollama/qwen2.5-coder:7b
+      api_base: http://host.containers.internal:11434
+      request_timeout: 90
+
+  - model_name: qwen2.5:1.5b
+    litellm_params:
+      model: ollama/qwen2.5:1.5b
+      api_base: http://host.containers.internal:11434
+      request_timeout: 30
+
+  # ─── Direct Agent Aliases ────────────────────
+  - model_name: agent-po
+    litellm_params:
+      model: ollama/llama3.1:8b
+      api_base: http://host.containers.internal:11434
+
+  - model_name: agent-architect
+    litellm_params:
+      model: ollama/llama3.1:8b
+      api_base: http://host.containers.internal:11434
+
+  - model_name: agent-coder
+    litellm_params:
+      model: ollama/qwen2.5-coder:7b
+      api_base: http://host.containers.internal:11434
+
+  - model_name: agent-devops
+    litellm_params:
+      model: ollama/llama3.1:8b
+      api_base: http://host.containers.internal:11434
+
+  - model_name: agent-researcher
+    litellm_params:
+      model: ollama/llama3.1:8b
+      api_base: http://host.containers.internal:11434
+
+  # ─── Smart Routing Groups (Pure Local Routing) ──
+  - model_name: smart-coder
+    litellm_params:
+      model: ollama/qwen2.5-coder:7b
+      api_base: http://host.containers.internal:11434
+      tpm: 100000
+      rpm: 1000
+
+  - model_name: smart-general
+    litellm_params:
+      model: ollama/llama3.1:8b
+      api_base: http://host.containers.internal:11434
+      tpm: 100000
+      rpm: 1000
+
+# ─── Router Fallback & Failover Strategy ─────
+router_settings:
+  routing_strategy: usage-based-routing
+  set_verbose: false
+  num_retries: 2
+  timeout: 90
+  allowed_fails: 2
+  cooldown_time: 60
+  fallbacks:
+    - smart-coder: ["local-coder-fast"]
+    - smart-general: ["local-general-fast"]
+    - local-coder: ["local-coder-fast"]
+    - local-general: ["local-general-fast"]

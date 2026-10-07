@@ -1,0 +1,349 @@
+# ──────────────────────────────────────────────
+# LiteLLM Proxy – Declarative MCP Server Registry
+# ──────────────────────────────────────────────
+# Defines standard Model Context Protocol (MCP) servers with granular RBAC,
+# token separation, and security guardrails.
+# Docs: https://docs.litellm.ai/docs/proxy/mcp
+
+mcp_servers:
+
+  # ─── 0. LiteLLM Gateway MCP ──────────────────
+  # Built-in proxy management, model catalog inspection, health & API key creation
+  litellm_mcp:
+    name: "LiteLLM Gateway Management MCP"
+    description: "Manage models, inspect gateway health, query router analytics, and create virtual API keys."
+    transport: "stdio"
+    command: "python3"
+    args:
+      - "/app/scripts/mcp/litellm_mcp.py"
+    environment:
+      LITELLM_API_BASE: "http://localhost:4000"
+      LITELLM_MASTER_KEY: "os.environ/LITELLM_MASTER_KEY"
+    timeout: 30
+    allowed_tools:
+      - "list_gateway_models"
+      - "get_gateway_health"
+      - "test_gateway_completion"
+      - "generate_api_key"
+
+  # ─── 1. Cloudflare MCP Server (Infra / DevOps) ──
+  cloudflare_mcp:
+    name: "Cloudflare Infrastructure MCP"
+    description: "Manage DNS, Cloudflare Tunnels, Zero Trust access policies, and Edge Workers."
+    transport: "stdio"
+    command: "python3"
+    args:
+      - "/app/scripts/mcp/cloudflare_mcp.py"
+    environment:
+      CLOUDFLARE_API_TOKEN: "os.environ/CLOUDFLARE_API_TOKEN"
+      CLOUDFLARE_EMAIL: "os.environ/CLOUDFLARE_EMAIL"
+      CLOUDFLARE_ACCOUNT_ID: "os.environ/CLOUDFLARE_ACCOUNT_ID"
+    timeout: 30
+    allowed_tools:
+      - "verify_token"
+      - "list_zones"
+      - "list_dns_records"
+      - "get_dns_record"
+      - "create_dns_record"
+      - "update_dns_record"
+      - "list_tunnels"
+      - "get_tunnel_status"
+      - "list_workers"
+    disallowed_tools:
+      - "delete_zone"
+      - "delete_tunnel"
+
+  # ─── 2. GitHub Developer MCP Server (Read-Only for Developers) ──
+  github_mcp:
+    name: "GitHub Developer MCP"
+    description: "Safe repository inspection, code reading, PR review, and issue search."
+    transport: "sse"
+    url: "https://mcp.github.com/sse"
+    headers:
+      Authorization: "Bearer os.environ/GITHUB_READONLY_TOKEN"
+      Accept: "application/vnd.github.v3+json"
+      User-Agent: "LiteLLM-A2A-Gateway"
+    timeout: 45
+    allowed_tools:
+      - "search_repositories"
+      - "get_file_contents"
+      - "list_commits"
+      - "get_issue"
+      - "list_issues"
+      - "list_pull_requests"
+      - "get_pull_request"
+      - "list_branches"
+    disallowed_tools:
+      - "create_issue"
+      - "create_pull_request"
+      - "delete_repository"
+      - "delete_branch"
+      - "force_push"
+
+  # ─── 3. GitHub MCP Server (Tier 2: Write / DevOps Scoped) ────────
+  github_devops_mcp:
+    name: "GitHub DevOps & Automation MCP"
+    description: "Automated PR creation, issue triaging, and workflow dispatch."
+    transport: "sse"
+    url: "https://mcp.github.com/sse"
+    headers:
+      Authorization: "Bearer os.environ/GITHUB_DEVOPS_TOKEN"
+      Accept: "application/vnd.github.v3+json"
+      User-Agent: "LiteLLM-A2A-Gateway"
+    timeout: 60
+    allowed_tools:
+      - "create_issue"
+      - "create_pull_request"
+      - "update_pull_request"
+      - "create_issue_comment"
+    disallowed_tools:
+      - "delete_repository"
+      - "delete_branch"
+      - "force_push"
+
+  # ─── 4. GitHub MCP Server (Tier 3: User Token Passthrough) ──────
+  github_user_passthrough_mcp:
+    name: "GitHub User Passthrough MCP"
+    description: "Forwards individual caller OAuth/PAT tokens per-request."
+    transport: "sse"
+    url: "https://mcp.github.com/sse"
+    # Dynamic header forwarding from client request
+    forward_headers:
+      - "Authorization"
+      - "X-GitHub-Token"
+    timeout: 45
+
+  # ─── 5. Web Search MCP Servers ────────────────
+  brave_search_mcp:
+    name: "Brave Search MCP"
+    description: "Privacy-focused web search, news aggregation, and local entity retrieval."
+    transport: "http"
+    url: "https://api.search.brave.com/res/v1/mcp"
+    headers:
+      X-Subscription-Token: "os.environ/BRAVE_API_KEY"
+      Accept: "application/json"
+    timeout: 30
+    allowed_tools:
+      - "web_search"
+      - "news_search"
+      - "summarize_url"
+
+  google_search_mcp:
+    name: "Google Serper MCP"
+    description: "Google Search index querying, knowledge graph queries, and web scraping."
+    transport: "http"
+    url: "https://google.serper.dev/mcp"
+    headers:
+      X-API-KEY: "os.environ/SERPER_API_KEY"
+      Content-Type: "application/json"
+    timeout: 30
+    allowed_tools:
+      - "google_search"
+      - "scrape_webpage"
+      - "google_search_scholar"
+
+  # ─── 6. Google Workspace / Drive MCP ──────────
+  google_workspace_mcp:
+    name: "Google Workspace & Drive MCP"
+    description: "Read, search, and manage Google Drive files, Google Docs, and Spreadsheets."
+    transport: "http"
+    url: "https://workspace-mcp.googleapis.com/v1"
+    headers:
+      Authorization: "Bearer os.environ/GOOGLE_WORKSPACE_ACCESS_TOKEN"
+      X-Goog-User-Project: "os.environ/GOOGLE_PROJECT_ID"
+    timeout: 60
+    allowed_tools:
+      - "search_drive"
+      - "read_doc"
+      - "read_sheet"
+      - "list_folder_contents"
+      - "create_doc"
+      - "append_to_sheet"
+    disallowed_tools:
+      - "delete_file_permanently"
+      - "empty_trash"
+      - "change_file_ownership"
+
+  # ─── 7. Sandboxed Local Filesystem MCP ────────
+  filesystem_mcp:
+    name: "Sandboxed Local Filesystem MCP"
+    description: "Safe file reading, writing, diffing, and searching inside the designated workspace."
+    transport: "stdio"
+    command: "python3"
+    args:
+      - "/app/scripts/mcp/filesystem_mcp.py"
+      - "/workspace"
+    environment:
+      WORKSPACE_ROOT: "/workspace"
+    timeout: 30
+    allowed_tools:
+      - "read_file"
+      - "write_file"
+      - "list_directory"
+      - "get_file_info"
+      - "search_files"
+    disallowed_tools:
+      - "execute_arbitrary_binary"
+      - "format_disk"
+
+  # ─── 8. FRITZ!Box Home Network & Smart Home MCP ───
+  fritzbox_mcp:
+    name: "FRITZ!Box Network & Smart Home MCP"
+    description: "Inspect network devices, WAN IP status, guest Wi-Fi, and Smart Home DECT devices."
+    transport: "stdio"
+    command: "python3"
+    args:
+      - "/app/scripts/mcp/fritzbox_mcp.py"
+    environment:
+      FRITZBOX_HOST: "os.environ/FRITZBOX_HOST"
+      FRITZBOX_PORT: "os.environ/FRITZBOX_PORT"
+      FRITZBOX_USER: "os.environ/FRITZBOX_USER"
+      FRITZBOX_PASSWORD: "os.environ/FRITZBOX_PASSWORD"
+      FRITZBOX_USE_SSL: "os.environ/FRITZBOX_USE_SSL"
+    timeout: 60
+    allowed_tools:
+      - "get_fritzbox_info"
+      - "get_system_logs"
+      - "get_wan_status"
+      - "get_fiber_diagnostics"
+      - "list_network_devices"
+      - "get_device_details"
+      - "wake_on_lan"
+      - "get_mesh_topology"
+      - "get_wifi_status"
+      - "set_guest_wifi"
+      - "get_call_list"
+      - "get_smarthome_devices"
+      - "reconnect_wan"
+
+  # ─── 9. SearXNG Meta-Search MCP ───────────────
+  searxng_mcp:
+    name: "SearXNG Meta-Search MCP"
+    description: "Privacy-focused web search, news aggregation, and academic search for research agents."
+    transport: "stdio"
+    command: "python3"
+    args:
+      - "/app/scripts/mcp/searxng_mcp.py"
+    environment:
+      SEARXNG_URL: "http://searxng:8080"
+    timeout: 30
+    allowed_tools:
+      - "search_web"
+      - "search_news"
+      - "search_scholar"
+
+  # ─── 10. Browserless Headless Chromium MCP ────
+  browserless_mcp:
+    name: "Browserless Headless Chromium MCP"
+    description: "Navigate dynamic web pages, extract DOM and rendered text, capture visual screenshots."
+    transport: "stdio"
+    command: "python3"
+    args:
+      - "/app/scripts/mcp/browserless_mcp.py"
+    environment:
+      BROWSERLESS_URL: "http://browserless:3000"
+    timeout: 45
+    allowed_tools:
+      - "get_web_content"
+      - "scrape_text"
+      - "take_screenshot"
+
+  # ─── 11. Isolated Code Execution Sandbox MCP ──
+  sandbox_mcp:
+    name: "Isolated Code Execution Sandbox MCP"
+    description: "Execute ephemeral Python and Shell code in a secure, non-root, resource-limited container."
+    transport: "stdio"
+    command: "python3"
+    args:
+      - "/app/scripts/mcp/sandbox_mcp.py"
+    environment:
+      SANDBOX_URL: "http://sandbox:8088"
+    timeout: 30
+    allowed_tools:
+      - "execute_python"
+      - "execute_shell"
+
+  # ─── 12. Docker Monitoring & Container MCP ───
+  docker_mcp:
+    name: "Docker Container Management MCP"
+    description: "Inspect container states, retrieve stdout/stderr logs, and trigger safe restarts."
+    transport: "stdio"
+    command: "python3"
+    args:
+      - "/app/scripts/mcp/docker_mcp.py"
+    environment:
+      DOCKER_SOCKET: "/var/run/docker.sock"
+    timeout: 45
+    allowed_tools:
+      - "get_container_status"
+      - "get_container_logs"
+      - "restart_container"
+
+  # ─── 13. Product & Specification Management MCP ──
+  spec_mcp:
+    name: "Product & Specification Management MCP"
+    description: "Save, list, and inspect product specifications, user stories, and requirements."
+    transport: "stdio"
+    command: "python3"
+    args:
+      - "/app/scripts/mcp/spec_mcp.py"
+    environment:
+      SPECS_DIR: "/workspace/docs/specs"
+    timeout: 30
+    allowed_tools:
+      - "save_specification"
+      - "list_specifications"
+      - "load_specification"
+
+  # ─── 14. Architecture Documentation MCP ──────
+  architecture_mcp:
+    name: "System Architecture Documentation MCP"
+    description: "Save, list, and inspect Architecture Decision Records (ADRs) and system designs."
+    transport: "stdio"
+    command: "python3"
+    args:
+      - "/app/scripts/mcp/architecture_mcp.py"
+    environment:
+      ARCHITECTURE_DIR: "/workspace/docs/architecture"
+    timeout: 30
+    allowed_tools:
+      - "save_architecture_doc"
+      - "list_architecture_docs"
+      - "load_architecture_doc"
+
+  # ─── 15. Qdrant Vector Memory & RAG MCP ──────
+  qdrant_mcp:
+    name: "Qdrant Vector Knowledge Memory MCP"
+    description: "Semantic search and long-term memory retrieval using nomic-embed-text embeddings."
+    transport: "stdio"
+    command: "python3"
+    args:
+      - "/app/scripts/mcp/qdrant_mcp.py"
+    environment:
+      QDRANT_URL: "http://qdrant:6333"
+      LITELLM_API_BASE: "http://localhost:4000"
+      LITELLM_MASTER_KEY: "os.environ/LITELLM_MASTER_KEY"
+      EMBEDDING_MODEL: "nomic-embed-text"
+    timeout: 30
+    allowed_tools:
+      - "remember_knowledge"
+      - "recall_knowledge"
+
+  # ─── 16. Memgraph Knowledge Graph MCP ─────────
+  memgraph_mcp:
+    name: "Memgraph Knowledge Graph MCP"
+    description: "Query and mutate the live knowledge graph, map system dependencies, and execute Cypher."
+    transport: "stdio"
+    command: "python3"
+    args:
+      - "/app/scripts/mcp/memgraph_mcp.py"
+    environment:
+      MEMGRAPH_BOLT_URL: "bolt://memgraph:7687"
+    timeout: 30
+    allowed_tools:
+      - "query_graph"
+      - "add_graph_entity"
+      - "add_graph_relation"
+      - "get_system_dependencies"
+
+

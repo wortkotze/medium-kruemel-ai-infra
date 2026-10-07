@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="alternate icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/favicon.png">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    (function() {
+      var l = localStorage.getItem("kruemel_lang") || "de";
+      document.documentElement.setAttribute("lang", l);
+      var t = localStorage.getItem("kruemel_theme") || "dark";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body>
+  <div id="global-tooltip"></div>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <a href="/" class="brand-link">
+        <span class="brand-logo">🍪</span>
+        <span class="brand-title">Krümel AI</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link active" data-i18n="nav_overview">Übersicht</a></li>
+        <li><a href="/chat" class="nav-link" data-i18n="nav_chat">💬 Chat</a></li>
+        <li><a href="/agents" class="nav-link" data-i18n="nav_agents">🤖 Agenten</a></li>
+        <li><a href="/status" class="nav-link" data-i18n="nav_status">Status & Uptime</a></li>
+        <li><a href="/docs" class="nav-link" data-i18n="nav_docs">Architektur & Doku</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="/status" id="header-health-pill" class="health-indicator-btn">
+          <div class="pulse-dot"></div>
+          <span id="header-health-text" data-i18n="pill_checking">Prüfe Infrastruktur...</span>
+        </a>
+        <button id="btn-theme" class="ctrl-btn" onclick="toggleTheme()" data-i18n="btn_theme_light">☀️ Hell</button>
+        <button id="btn-lang" class="ctrl-btn" onclick="toggleLanguage()">🇬🇧 EN</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Fullscreen Matrix / ASCII Engineering Hero Section -->
+  <section class="hero-matrix">
+    <canvas id="matrix-canvas"></canvas>
+    
+    <div class="matrix-overlay">
+      <div class="matrix-hud">
+        <div class="hud-tag" data-i18n="hud_tag">KRÜMEL_INFRA // RUNTIME_V2.6</div>
+        <h1 class="matrix-title" data-i18n="matrix_title">SYSTEM-INFRASTRUKTUR & ORCHESTRIERUNG</h1>
+        <p class="matrix-subtitle" data-i18n="matrix_subtitle">Zentrales Steuerungsportal für lokale KI-Infrastruktur, Observability, verteilte Agenten & High-Speed Inferenz.</p>
+        
+        <div class="matrix-specs">
+          <div class="spec-item">
+            <span class="spec-k" data-i18n="spec_daemons">DAEMONS</span>
+            <span class="spec-v" data-i18n="spec_daemons_val">9 CONTAINER AKTIV</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-k" data-i18n="spec_inference">INFERENZ</span>
+            <span class="spec-v" data-i18n="spec_inference_val">APPLE SILICON GPU</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-k" data-i18n="spec_storage">PERSISTENZ</span>
+            <span class="spec-v" data-i18n="spec_storage_val">POSTGRESQL 16</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-k" data-i18n="spec_gateway">GATEWAY</span>
+            <span class="spec-v" data-i18n="spec_gateway_val">LITELLM :4000</span>
+          </div>
+        </div>
+
+        <div class="matrix-actions">
+          <a href="#systems" class="matrix-btn primary" data-i18n="hero_btn_explore">Systeme erkunden ↓</a>
+          <a href="/status" class="matrix-btn secondary" data-i18n="hero_btn_status">Live Status Monitor →</a>
+          <a href="/docs" class="matrix-btn secondary" data-i18n="hero_btn_docs">Architektur & Handbuch →</a>
+        </div>
+      </div>
+
+      <a href="#systems" class="scroll-indicator">
+        <span data-i18n="scroll_explore">SYSTEME ENTDECKEN</span>
+        <div class="scroll-chevron">↓</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Systems Overview Section -->
+  <main id="systems" class="container systems-section">
+    <!-- Core Applications Grid -->
+    <div class="section-title">
+      <span data-i18n="section_apps">Kernkomponenten & Portale</span>
+    </div>
+
+    <div class="grid-cards">
+      <!-- Krümel AI Chat (Open WebUI) -->
+      <a href="/chat" class="card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <div class="icon-box">💬</div>
+            <div>
+              <div class="card-title" data-i18n="card_webui_title">Krümel AI Chat</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="card_webui_sub">Human-to-AI Workspace</div>
+            </div>
+          </div>
+          <span class="card-port">:1513</span>
+        </div>
+        <p class="card-desc" data-i18n="card_webui_desc">
+          Vollwertiges Chat-Interface im ChatGPT/Gemini-Stil (Open WebUI). Unterstützt fliegenden Modellwechsel, RAG-Dateiuploads, Prompt-Vorlagen und Live-Streaming via LiteLLM.
+        </p>
+        <ul class="card-meta-list">
+          <li class="card-meta-item"><span data-i18n="meta_ui_lbl">Oberfläche:</span><span data-i18n="meta_ui_val">Open WebUI (:1513)</span></li>
+          <li class="card-meta-item"><span data-i18n="meta_rag_lbl">Features:</span><span data-i18n="meta_rag_val">RAG, Dateiupload & Presets</span></li>
+        </ul>
+        <div class="card-footer">
+          <span data-i18n="open_chat">Chat öffnen ↗</span>
+          <span>→</span>
+        </div>
+      </a>
+
+      <!-- LiteLLM -->
+      <a href="http://localhost:4000/ui" target="_blank" class="card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <div class="icon-box">🛡️</div>
+            <div>
+              <div class="card-title" data-i18n="card_litellm_title">LiteLLM Gateway</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="card_litellm_sub">AI Governance & Router</div>
+            </div>
+          </div>
+          <span class="card-port">:4000</span>
+        </div>
+        <p class="card-desc" data-i18n="card_litellm_desc">
+          Zentrales KI-Gateway für alle Modelle. Übernimmt RBAC-Zugriffskontrolle, virtuelle API-Keys, PII-Datenmaskierung, Spend-Tracking und A2A-Agentenprofile.
+        </p>
+        <ul class="card-meta-list">
+          <li class="card-meta-item"><span data-i18n="meta_proto_lbl">Protokoll:</span><span data-i18n="meta_proto_val">OpenAI-kompatibel /v1</span></li>
+          <li class="card-meta-item"><span data-i18n="meta_routing_lbl">Routing:</span><span data-i18n="meta_routing_val">Lokal (Ollama) & Cloud-Fallback</span></li>
+        </ul>
+        <div class="card-footer">
+          <span data-i18n="open_admin_ui">Admin-UI öffnen ↗</span>
+          <span>→</span>
+        </div>
+      </a>
+
+      <!-- Langfuse -->
+      <a href="http://localhost:3000" target="_blank" class="card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <div class="icon-box">📈</div>
+            <div>
+              <div class="card-title" data-i18n="card_langfuse_title">Langfuse Observability</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="card_langfuse_sub">Tracing & Evaluierung</div>
+            </div>
+          </div>
+          <span class="card-port">:3000</span>
+        </div>
+        <p class="card-desc" data-i18n="card_langfuse_desc">
+          LLM-Application Tracing in Echtzeit. Visualisiert komplexe Agent-Ketten, Einzelschritte, Latenzen, Token-Kosten und Prompt-Versionen.
+        </p>
+        <ul class="card-meta-list">
+          <li class="card-meta-item"><span data-i18n="meta_analytics_lbl">Analytik:</span><span data-i18n="meta_analytics_val">ClickHouse OLAP Backend</span></li>
+          <li class="card-meta-item"><span data-i18n="meta_storage_lbl">Storage:</span><span data-i18n="meta_storage_val">MinIO S3 Event Store</span></li>
+        </ul>
+        <div class="card-footer">
+          <span data-i18n="open_dashboard">Dashboard öffnen ↗</span>
+          <span>→</span>
+        </div>
+      </a>
+
+      <!-- n8n -->
+      <a href="http://localhost:5678" target="_blank" class="card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <div class="icon-box">⚡</div>
+            <div>
+              <div class="card-title" data-i18n="card_n8n_title">n8n Automation Engine</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="card_n8n_sub">Low-Code Workflow AI</div>
+            </div>
+          </div>
+          <span class="card-port">:5678</span>
+        </div>
+        <p class="card-desc" data-i18n="card_n8n_desc">
+          Leistungsstarke visuelle Workflow-Automation. Erstellt autonome Multi-Step-Agenten, Event-Trigger, Webhooks und Tool-Orchestrierungen.
+        </p>
+        <ul class="card-meta-list">
+          <li class="card-meta-item"><span data-i18n="meta_workflows_lbl">Engine:</span><span data-i18n="meta_workflows_val">Node-based Canvas</span></li>
+          <li class="card-meta-item"><span data-i18n="meta_triggers_lbl">Trigger:</span><span data-i18n="meta_triggers_val">Webhooks, Cron & APIs</span></li>
+        </ul>
+        <div class="card-footer">
+          <span data-i18n="open_canvas">Canvas öffnen ↗</span>
+          <span>→</span>
+        </div>
+      </a>
+
+      <!-- Qdrant -->
+      <a href="http://localhost:6333/dashboard" target="_blank" class="card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <div class="icon-box">🗄️</div>
+            <div>
+              <div class="card-title" data-i18n="card_qdrant_title">Qdrant Vector DB</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="card_qdrant_sub">Semantisches Gedächtnis</div>
+            </div>
+          </div>
+          <span class="card-port">:6333</span>
+        </div>
+        <p class="card-desc" data-i18n="card_qdrant_desc">
+          In Rust geschriebene Hochleistungs-Vektordatenbank mit HNSW-Indexierung für semantische Ähnlichkeitssuche und Langzeit-RAG-Memory.
+        </p>
+        <ul class="card-meta-list">
+          <li class="card-meta-item"><span data-i18n="meta_engine_lbl">Core:</span><span data-i18n="meta_engine_val">Rust HNSW Engine</span></li>
+          <li class="card-meta-item"><span data-i18n="meta_index_lbl">Schnittstelle:</span><span data-i18n="meta_index_val">REST & gRPC Ports</span></li>
+        </ul>
+        <div class="card-footer">
+          <span data-i18n="open_console">Konsole öffnen ↗</span>
+          <span>→</span>
+        </div>
+      </a>
+
+      <!-- Memgraph Knowledge Graph -->
+      <a href="http://localhost:1515" target="_blank" class="card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <div class="icon-box">🕸️</div>
+            <div>
+              <div class="card-title" data-i18n="card_memgraph_title">Memgraph Knowledge Graph</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="card_memgraph_sub">Strukturiertes Wissen & Relationen</div>
+            </div>
+          </div>
+          <span class="card-port">:1515</span>
+        </div>
+        <p class="card-desc" data-i18n="card_memgraph_desc">
+          Ultra-schnelle C++ In-Memory Graphdatenbank mit Cypher/Bolt & Memgraph Lab Studio. Ermöglicht Multi-Hop Reasoning, GraphRAG und Beziehungsanalysen.
+        </p>
+        <ul class="card-meta-list">
+          <li class="card-meta-item"><span data-i18n="meta_protocol_lbl">Protokoll:</span><span data-i18n="meta_protocol_val">Bolt (:7687) & Cypher</span></li>
+          <li class="card-meta-item"><span data-i18n="meta_studio_lbl">Studio:</span><span data-i18n="meta_studio_val">Memgraph Lab Visualizer</span></li>
+        </ul>
+        <div class="card-footer">
+          <span data-i18n="open_graph_lab">Graph Studio öffnen ↗</span>
+          <span>→</span>
+        </div>
+      </a>
+
+      <!-- Browserless Chromium -->
+      <a href="http://localhost:1516" target="_blank" class="card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <div class="icon-box">🌐</div>
+            <div>
+              <div class="card-title" data-i18n="card_browserless_title">Browserless Chromium</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="card_browserless_sub">Headless Web Browsing & Scraping</div>
+            </div>
+          </div>
+          <span class="card-port">:1516</span>
+        </div>
+        <p class="card-desc" data-i18n="card_browserless_desc">
+          Vollwertiger Headless-Chromium-Browser für Agenten via REST & Playwright CDP. Ermöglicht Web-Navigation, Scraping dynamischer SPAs und Screenshots.
+        </p>
+        <ul class="card-meta-list">
+          <li class="card-meta-item"><span data-i18n="meta_browser_proto_lbl">Protokoll:</span><span data-i18n="meta_browser_proto_val">REST & Playwright CDP</span></li>
+          <li class="card-meta-item"><span data-i18n="meta_browser_caps_lbl">Features:</span><span data-i18n="meta_browser_caps_val">DOM, Screenshots & PDF</span></li>
+        </ul>
+        <div class="card-footer">
+          <span data-i18n="open_browser_lab">Browser Konsole öffnen ↗</span>
+          <span>→</span>
+        </div>
+      </a>
+
+      <!-- Code Execution Sandbox -->
+      <a href="http://localhost:1517/health" target="_blank" class="card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <div class="icon-box">⚡</div>
+            <div>
+              <div class="card-title" data-i18n="card_sandbox_title">Code Execution Sandbox</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="card_sandbox_sub">Isolierte Tool-Ausführung</div>
+            </div>
+          </div>
+          <span class="card-port">:1517</span>
+        </div>
+        <p class="card-desc" data-i18n="card_sandbox_desc">
+          Sichere, kurzlebige Python- und Bash-Sandbox für LLM-Agenten. Führt Code unter unprivilegiertem User (UID 1000) mit Memory- und Timeout-Limits aus.
+        </p>
+        <ul class="card-meta-list">
+          <li class="card-meta-item"><span data-i18n="meta_sandbox_runtime_lbl">Laufzeit:</span><span data-i18n="meta_sandbox_runtime_val">Python 3.11 & Alpine Shell</span></li>
+          <li class="card-meta-item"><span data-i18n="meta_sandbox_isolation_lbl">Isolation:</span><span data-i18n="meta_sandbox_isolation_val">Non-Root (Limits: 512MB)</span></li>
+        </ul>
+        <div class="card-footer">
+          <span data-i18n="open_sandbox_health">Health API ansehen ↗</span>
+          <span>→</span>
+        </div>
+      </a>
+
+      <!-- SearXNG Meta-Search -->
+      <a href="http://localhost:1514" target="_blank" class="card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <div class="icon-box">🔍</div>
+            <div>
+              <div class="card-title" data-i18n="card_searxng_title">SearXNG Meta-Search</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="card_searxng_sub">Lokale Web-Suche & Research API</div>
+            </div>
+          </div>
+          <span class="card-port">:1514</span>
+        </div>
+        <p class="card-desc" data-i18n="card_searxng_desc">
+          Datenschutzfreundliche Meta-Suchmaschine. Aggregiert Google, Bing, DuckDuckGo & ArXiv ohne Tracking. Stellt Agenten eine unlimitierte JSON-Such-API bereit.
+        </p>
+        <ul class="card-meta-list">
+          <li class="card-meta-item"><span data-i18n="meta_searxng_mode_lbl">Quellen:</span><span data-i18n="meta_searxng_mode_val">Google, Bing, DDG, ArXiv</span></li>
+          <li class="card-meta-item"><span data-i18n="meta_searxng_api_lbl">Output:</span><span data-i18n="meta_searxng_api_val">JSON API & Web UI</span></li>
+        </ul>
+        <div class="card-footer">
+          <span data-i18n="open_searxng_ui">Suche öffnen ↗</span>
+          <span>→</span>
+        </div>
+      </a>
+
+      <!-- Ollama -->
+      <a href="http://localhost:11434" target="_blank" class="card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <div class="icon-box">🦙</div>
+            <div>
+              <div class="card-title" data-i18n="card_ollama_title">Ollama Local Engine</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="card_ollama_sub">Lokale Hardware-Inferenz</div>
+            </div>
+          </div>
+          <span class="card-port">:11434</span>
+        </div>
+        <p class="card-desc" data-i18n="card_ollama_desc">
+          Führt Open-Source Sprachmodelle wie Qwen 2.5 Coder oder Llama 3.1 direkt auf der Apple Silicon GPU aus – vollkommen offline ohne Datenabfluss.
+        </p>
+        <ul class="card-meta-list">
+          <li class="card-meta-item"><span data-i18n="meta_hardware_lbl">Hardware:</span><span data-i18n="meta_hardware_val">Metal Neural Engine</span></li>
+          <li class="card-meta-item"><span data-i18n="meta_models_lbl">Modelle:</span><span data-i18n="meta_models_val">Qwen 2.5, Llama 3.1, Nomic</span></li>
+        </ul>
+        <div class="card-footer">
+          <span data-i18n="open_endpoint">API Endpunkt ansehen ↗</span>
+          <span>→</span>
+        </div>
+      </a>
+
+      <!-- Krümel AI Agents -->
+      <a href="/docs" class="card">
+        <div class="card-top">
+          <div class="card-title-group">
+            <div class="icon-box">🤖</div>
+            <div>
+              <div class="card-title" data-i18n="card_agents_title">Krümel Agents (Python)</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="card_agents_sub">Autonome StateGraphs</div>
+            </div>
+          </div>
+          <span class="card-port">Python / uv</span>
+        </div>
+        <p class="card-desc" data-i18n="card_agents_desc">
+          Eigene Python-Agenten unter 'kruemel-ai-agents', verwaltet mit modernem 'uv'-Paketmanager. StateGraph-Pipelines mit Tool Calling.
+        </p>
+        <ul class="card-meta-list">
+          <li class="card-meta-item"><span data-i18n="meta_env_lbl">Umgebung:</span><span data-i18n="meta_env_val">uv Venv & Python 3.11</span></li>
+          <li class="card-meta-item"><span data-i18n="meta_state_lbl">Framework:</span><span data-i18n="meta_state_val">LangGraph Multi-Agent</span></li>
+        </ul>
+        <div class="card-footer">
+          <span data-i18n="open_docs_guide">Architektur ansehen ↗</span>
+          <span>→</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Quickstart Code Panel -->
+    <div class="section-title">
+      <span data-i18n="section_quickstart">Entwickler-Schnellstart</span>
+    </div>
+
+    <div class="snippet-panel">
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;" data-i18n="quickstart_desc">
+        Befehle zur Steuerung, Überprüfung und Nutzung der lokalen Infrastruktur:
+      </p>
+      <div class="snippet-tabs">
+        <button class="snippet-tab-btn active" onclick="switchSnippet(this, 'python')" data-i18n="tab_python">Python (OpenAI SDK)</button>
+        <button class="snippet-tab-btn" onclick="switchSnippet(this, 'langchain')" data-i18n="tab_langchain">LangChain / LangGraph</button>
+        <button class="snippet-tab-btn" onclick="switchSnippet(this, 'curl')" data-i18n="tab_curl">cURL Request</button>
+      </div>
+
+      <pre id="snippet-python"><code>from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:4000/v1",
+    api_key="&lt;LITELLM_MASTER_KEY&gt;"
+)
+
+response = client.chat.completions.create(
+    model="local-general",   # Routing auf lokales Llama 3.1 via LiteLLM
+    messages=[{"role": "user", "content": "Prüfe den Systemzustand."}],
+    temperature=0.2
+)
+print(response.choices[0].message.content)</code></pre>
+
+      <pre id="snippet-langchain" style="display: none;"><code>from langchain_openai import ChatOpenAI
+from langfuse.langchain import CallbackHandler
+
+langfuse_handler = CallbackHandler(
+    host="http://localhost:3000",
+    public_key="&lt;LANGFUSE_PUBLIC_KEY&gt;",
+    secret_key="&lt;LANGFUSE_SECRET_KEY&gt;"
+)
+
+llm = ChatOpenAI(
+    model="local-coder",
+    openai_api_base="http://localhost:4000/v1",
+    openai_api_key="&lt;LITELLM_MASTER_KEY&gt;",
+    callbacks=[langfuse_handler]
+)
+
+response = llm.invoke("Erstelle ein Bash-Backup-Skript.")</code></pre>
+
+      <pre id="snippet-curl" style="display: none;"><code>curl -X POST http://localhost:4000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer &lt;LITELLM_MASTER_KEY&gt;" \
+  -d '{
+    "model": "local-coder",
+    "messages": [{"role": "user", "content": "Hello World"}],
+    "max_tokens": 64
+  }'</code></pre>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <span data-i18n="footer_platform">Krümel AI Platform &bull; Port 1512</span>
+      <div class="footer-links">
+        <a href="/api/health" target="_blank" class="footer-link" data-i18n="footer_health_api">Health Endpoint (JSON ↗)</a>
+        <span>&bull;</span>
+        <a href="/chat" class="footer-link" data-i18n="nav_chat">💬 Chat</a>
+        <span>&bull;</span>
+        <a href="/status" class="footer-link" data-i18n="nav_status">Status & Uptime</a>
+        <span>&bull;</span>
+        <a href="/docs" class="footer-link" data-i18n="nav_docs">Architektur & Doku</a>
+      </div>
+      <span>PostgreSQL 16 &bull; LiteLLM &bull; Langfuse &bull; Qdrant &bull; n8n</span>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+  <script>
+    function switchSnippet(el, type) {
+      document.querySelectorAll('.snippet-tab-btn').forEach(btn => btn.classList.remove('active'));
+      if (el) el.classList.add('active');
+      document.getElementById('snippet-python').style.display = type === 'python' ? 'block' : 'none';
+      document.getElementById('snippet-langchain').style.display = type === 'langchain' ? 'block' : 'none';
+      document.getElementById('snippet-curl').style.display = type === 'curl' ? 'block' : 'none';
+    }
+  </script>
+</body>
+</html>

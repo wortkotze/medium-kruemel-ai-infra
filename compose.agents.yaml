@@ -1,0 +1,127 @@
+networks:
+  litellm-net:
+    name: litellm_local_litellm-net
+    external: true
+
+x-agent-base: &agent-base
+  image: kruemel-ai-agent:latest
+  build:
+    context: ../medium-kruemel-ai-agents
+    dockerfile: Dockerfile
+  restart: unless-stopped
+  networks:
+    - litellm-net
+  healthcheck:
+    test: ["CMD-SHELL", "curl -f http://localhost:8001/health || exit 1"]
+    interval: 15s
+    timeout: 5s
+    retries: 3
+    start_period: 5s
+
+services:
+  agent-po:
+    <<: *agent-base
+    container_name: kruemel-agent-po
+    environment:
+      - AGENT_ID=agent-po
+      - CONTAINER_HOST=http://kruemel-agent-po
+      - AGENT_GATEWAY_URL=http://litellm-agent-gateway:1518
+      - LITELLM_API_BASE=http://litellm-proxy:4000/v1
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY}
+      - QDRANT_URL=http://litellm-qdrant:6333
+      - MEMGRAPH_URL=bolt://litellm-memgraph:7687
+    volumes:
+      - ./workspace/docs/specs:/app/docs/specs:rw
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+        reservations:
+          memory: 64M
+
+  agent-architect:
+    <<: *agent-base
+    container_name: kruemel-agent-architect
+    environment:
+      - AGENT_ID=agent-architect
+      - CONTAINER_HOST=http://kruemel-agent-architect
+      - AGENT_GATEWAY_URL=http://litellm-agent-gateway:1518
+      - LITELLM_API_BASE=http://litellm-proxy:4000/v1
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY}
+      - QDRANT_URL=http://litellm-qdrant:6333
+      - MEMGRAPH_URL=bolt://litellm-memgraph:7687
+    volumes:
+      - ./workspace/docs/architecture:/app/docs/architecture:rw
+      - ./workspace/docs/specs:/app/docs/specs:ro
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+        reservations:
+          memory: 64M
+
+  agent-coder:
+    <<: *agent-base
+    container_name: kruemel-agent-coder
+    environment:
+      - AGENT_ID=agent-coder
+      - CONTAINER_HOST=http://kruemel-agent-coder
+      - AGENT_GATEWAY_URL=http://litellm-agent-gateway:1518
+      - LITELLM_API_BASE=http://litellm-proxy:4000/v1
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY}
+      - QDRANT_URL=http://litellm-qdrant:6333
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+    volumes:
+      - ./workspace:/app/workspace:rw
+      - ./sandbox:/app/sandbox:rw
+    deploy:
+      resources:
+        limits:
+          memory: 768M
+        reservations:
+          memory: 128M
+
+  agent-researcher:
+    <<: *agent-base
+    container_name: kruemel-agent-researcher
+    environment:
+      - AGENT_ID=agent-researcher
+      - CONTAINER_HOST=http://kruemel-agent-researcher
+      - AGENT_GATEWAY_URL=http://litellm-agent-gateway:1518
+      - LITELLM_API_BASE=http://litellm-proxy:4000/v1
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY}
+      - QDRANT_URL=http://litellm-qdrant:6333
+      - SEARXNG_URL=http://litellm-searxng:8080
+      - BROWSERLESS_URL=http://litellm-browserless:3000
+    volumes:
+      - ./workspace/docs/research:/app/docs/research:rw
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 64M
+
+  agent-devops:
+    <<: *agent-base
+    container_name: kruemel-agent-devops
+    environment:
+      - AGENT_ID=agent-devops
+      - CONTAINER_HOST=http://kruemel-agent-devops
+      - AGENT_GATEWAY_URL=http://litellm-agent-gateway:1518
+      - LITELLM_API_BASE=http://litellm-proxy:4000/v1
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY}
+      - QDRANT_URL=http://litellm-qdrant:6333
+      - MEMGRAPH_URL=bolt://litellm-memgraph:7687
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN:-}
+      - FRITZBOX_IP=${FRITZBOX_IP:-}
+      - FRITZBOX_USER=${FRITZBOX_USER:-}
+      - FRITZBOX_PASSWORD=${FRITZBOX_PASSWORD:-}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    deploy:
+      resources:
+        limits:
+          memory: 384M
+        reservations:
+          memory: 64M

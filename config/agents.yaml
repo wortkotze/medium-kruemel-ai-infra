@@ -1,0 +1,206 @@
+# ──────────────────────────────────────────────
+# LiteLLM Proxy – A2A Agent Specifications (5 Roles)
+# ──────────────────────────────────────────────
+# Declarative definitions for autonomous agentic workflows conforming to A2A AgentCard spec.
+# IMPORTANT: All agents are strictly bound to LOCAL Ollama models.
+# Strictest tool isolation per role/domain.
+# Long-Term Memory (qdrant_mcp) for all 5 roles.
+# Knowledge Graph (memgraph_mcp) for Architect, DevOps, and PO.
+# Docs: https://docs.litellm.ai/docs/proxy/agents
+
+agents:
+
+  # ─── 1. Product Owner Agent ──────────────────
+  - agent_name: "agent-po"
+    litellm_params:
+      model: "local-general"          # Bound to local Ollama (llama-3.3-70b / llama3.1:8b)
+      temperature: 0.2
+      max_tokens: 4096
+      tools:
+        - "spec_mcp"
+        - "qdrant_mcp"
+        - "memgraph_mcp"
+    tools:
+      - "spec_mcp"
+      - "qdrant_mcp"
+      - "memgraph_mcp"
+    agent_card_params:
+      protocolVersion: "0.1.0"
+      name: "Product Owner & Requirements Agent"
+      description: "Translates business visions into structured specifications, user stories, PRDs, and acceptance criteria."
+      url: "http://localhost:4000/agents/agent-po"
+      version: "1.0.0"
+      capabilities:
+        streaming: true
+        tools: true
+      defaultInputModes:
+        - "text"
+      defaultOutputModes:
+        - "text"
+      skills:
+        - name: "Product & Specification Management"
+          description: "Persist, list, and inspect PRDs, user stories, and specifications in /workspace/docs/specs"
+        - name: "Vector Memory & Retrieval"
+          description: "Persist and recall long-term domain knowledge and requirements via Qdrant"
+        - name: "System Knowledge Graph"
+          description: "Inspect entities and relationships in the Memgraph knowledge graph"
+
+  # ─── 2. System Architecture Agent ────────────
+  - agent_name: "agent-architect"
+    litellm_params:
+      model: "local-general"          # Bound to local Ollama (llama-3.3-70b / llama3.1:8b)
+      temperature: 0.1
+      max_tokens: 8192
+      tools:
+        - "architecture_mcp"
+        - "spec_mcp"
+        - "qdrant_mcp"
+        - "memgraph_mcp"
+    tools:
+      - "architecture_mcp"
+      - "spec_mcp"
+      - "qdrant_mcp"
+      - "memgraph_mcp"
+    agent_card_params:
+      protocolVersion: "0.1.0"
+      name: "System & Software Architect Agent"
+      description: "Designs system architecture, defines component boundaries, evaluates specifications, and writes Architecture Decision Records (ADRs)."
+      url: "http://localhost:4000/agents/agent-architect"
+      version: "1.0.0"
+      capabilities:
+        streaming: true
+        tools: true
+      defaultInputModes:
+        - "text"
+      defaultOutputModes:
+        - "text"
+      skills:
+        - name: "Architecture Documentation (ADR)"
+          description: "Persist, list, and evaluate system designs, component topologies, and ADRs in /workspace/docs/architecture"
+        - name: "Specification Review"
+          description: "Load and inspect product specifications to produce aligned architecture designs"
+        - name: "Vector Memory & Retrieval"
+          description: "Semantic search and long-term memory retrieval across technical standards and patterns"
+        - name: "Knowledge Graph Modeling"
+          description: "Query and mutate service topologies, dependencies, and entity relationships in Memgraph"
+
+  # ─── 3. Code & Implementation Agent ──────────
+  - agent_name: "agent-coder"
+    litellm_params:
+      model: "local-coder"            # Bound to local Ollama (qwen2.5-coder:32b / qwen2.5-coder:7b)
+      temperature: 0.2
+      max_tokens: 8192
+      tools:
+        - "filesystem_mcp"
+        - "sandbox_mcp"
+        - "github_mcp"
+        - "qdrant_mcp"
+    tools:
+      - "filesystem_mcp"
+      - "sandbox_mcp"
+      - "github_mcp"
+      - "qdrant_mcp"
+    agent_card_params:
+      protocolVersion: "0.1.0"
+      name: "Software Architecture & Code Agent"
+      description: "Architects software systems, writes idiomatic code, refactors codebases, and performs repository audits."
+      url: "http://localhost:4000/agents/agent-coder"
+      version: "1.0.0"
+      capabilities:
+        streaming: true
+        tools: true
+      defaultInputModes:
+        - "text"
+      defaultOutputModes:
+        - "text"
+      skills:
+        - name: "Sandboxed Filesystem"
+          description: "Read, write, diff, and explore files inside the workspace sandbox"
+        - name: "Code Execution Sandbox"
+          description: "Safely execute, test, and benchmark Python and shell snippets in an isolated runtime"
+        - name: "GitHub Code Navigation"
+          description: "Inspect commits, PRs, branches, and code repositories"
+        - name: "Vector Memory & Snippet Recall"
+          description: "Store and recall tested algorithms, reusable patterns, and technical knowledge via Qdrant"
+
+  # ─── 4. Research & Web Intelligence Agent ────
+  - agent_name: "agent-researcher"
+    litellm_params:
+      model: "local-general"          # Bound to local Ollama (llama-3.3-70b / llama3.1:8b)
+      temperature: 0.3
+      max_tokens: 8192
+      tools:
+        - "searxng_mcp"
+        - "browserless_mcp"
+        - "qdrant_mcp"
+    tools:
+      - "searxng_mcp"
+      - "browserless_mcp"
+      - "qdrant_mcp"
+    agent_card_params:
+      protocolVersion: "0.1.0"
+      name: "Deep Research & Knowledge Agent"
+      description: "Performs web queries, extracts web documents, summarizes online sources, and navigates dynamic web pages."
+      url: "http://localhost:4000/agents/agent-researcher"
+      version: "1.0.0"
+      capabilities:
+        streaming: true
+        tools: true
+      defaultInputModes:
+        - "text"
+      defaultOutputModes:
+        - "text"
+      skills:
+        - name: "SearXNG Meta-Search"
+          description: "Query privacy meta-search aggregator for web, news, and academic papers without tracking"
+        - name: "Browserless Web Automation"
+          description: "Render dynamic web pages, scrape clean text, and capture screenshots using headless Chromium"
+        - name: "Long-Term Knowledge Storage"
+          description: "Persist distilled research papers, web facts, and summaries into vector memory via Qdrant"
+
+  # ─── 5. DevOps & Infrastructure Agent ────────
+  - agent_name: "agent-devops"
+    litellm_params:
+      model: "local-general"          # Bound to local Ollama (llama-3.3-70b / llama3.1:8b)
+      temperature: 0.1
+      max_tokens: 4096
+      tools:
+        - "docker_mcp"
+        - "litellm_mcp"
+        - "cloudflare_mcp"
+        - "fritzbox_mcp"
+        - "qdrant_mcp"
+        - "memgraph_mcp"
+    tools:
+      - "docker_mcp"
+      - "litellm_mcp"
+      - "cloudflare_mcp"
+      - "fritzbox_mcp"
+      - "qdrant_mcp"
+      - "memgraph_mcp"
+    agent_card_params:
+      protocolVersion: "0.1.0"
+      name: "DevOps & Infrastructure Automation Agent"
+      description: "Monitors Docker containers, inspects LiteLLM proxies, manages Cloudflare networking, and handles home infrastructure."
+      url: "http://localhost:4000/agents/agent-devops"
+      version: "1.0.0"
+      capabilities:
+        streaming: true
+        tools: true
+      defaultInputModes:
+        - "text"
+      defaultOutputModes:
+        - "text"
+      skills:
+        - name: "Docker Container Management"
+          description: "Inspect container states, retrieve stdout/stderr logs, and trigger safe restarts"
+        - name: "LiteLLM Gateway Management"
+          description: "Manage models, inspect gateway health, query router analytics, and create virtual API keys"
+        - name: "Cloudflare DNS & Tunnels"
+          description: "Manage DNS records, Cloudflare Tunnels, and Zero Trust access policies"
+        - name: "FRITZ!Box Network & Smart Home"
+          description: "Inspect local network devices, WAN status, guest Wi-Fi, and smart home DECT devices"
+        - name: "Infrastructure Knowledge Graph"
+          description: "Query and inspect service topologies, port mappings, and dependencies in Memgraph"
+        - name: "Incident & Runbook Memory"
+          description: "Persist and retrieve incident resolutions, runbooks, and configs in Qdrant"

@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="alternate icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/favicon.png">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* Status specific styles */
+    .monitors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(410px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2.75rem;
+    }
+
+    .monitor-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.35rem;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.15s ease;
+    }
+
+    .monitor-card:hover {
+      border-color: var(--border-focus);
+      background: var(--bg-surface-elevated);
+    }
+
+    .card-header-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
+    }
+
+    .service-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .service-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+
+    .service-title {
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+
+    .service-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .kpi-group {
+      text-align: right;
+    }
+
+    .uptime-badge {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent-green);
+    }
+
+    .uptime-badge.degraded { color: var(--accent-amber); }
+    .uptime-badge.offline { color: var(--accent-rose); }
+
+    .latency-meta {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .timeline-container {
+      margin: 1rem 0 0.85rem;
+    }
+
+    .timeline-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .timeline-bars {
+      display: flex;
+      gap: 3px;
+      height: 22px;
+      background: var(--bg-surface-elevated);
+      padding: 3px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+    }
+
+    .timeline-bar {
+      flex: 1;
+      border-radius: 2px;
+      background: var(--accent-green);
+      transition: opacity 0.2s, transform 0.2s;
+      cursor: pointer;
+    }
+
+    .timeline-bar:hover {
+      transform: scaleY(1.2);
+      opacity: 0.85;
+    }
+
+    .timeline-bar.degraded { background: var(--accent-amber); }
+    .timeline-bar.offline { background: var(--accent-rose); }
+    .timeline-bar.empty { background: var(--border-color); opacity: 0.4; }
+
+    .card-bottom-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 0.85rem;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.85rem;
+    }
+
+    .link-open {
+      color: var(--accent-blue);
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .btn-details {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .btn-details:hover { color: var(--text-primary); text-decoration: underline; }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      padding: 1.5rem;
+    }
+
+    .modal-backdrop.open { opacity: 1; pointer-events: auto; }
+
+    .modal-window {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      width: 100%;
+      max-width: 780px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 2rem;
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1.25rem;
+    }
+
+    .btn-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .modal-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .stat-box {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .stat-value {
+      font-size: 1.45rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      margin-top: 0.25rem;
+    }
+
+    .incident-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin-top: 1rem;
+    }
+
+    .incident-table th, .incident-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .incident-table th {
+      color: var(--text-muted);
+      font-weight: 600;
+      background: var(--bg-surface-elevated);
+    }
+  </style>
+  <script>
+    (function() {
+      var l = localStorage.getItem("kruemel_lang") || "de";
+      document.documentElement.setAttribute("lang", l);
+      var t = localStorage.getItem("kruemel_theme") || "dark";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body>
+  <div id="global-tooltip"></div>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <a href="/" class="brand-link">
+        <span class="brand-logo">🍪</span>
+        <span class="brand-title">Krümel AI</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link" data-i18n="nav_overview">Übersicht</a></li>
+        <li><a href="/chat" class="nav-link" data-i18n="nav_chat">💬 Chat</a></li>
+        <li><a href="/agents" class="nav-link" data-i18n="nav_agents">🤖 Agenten</a></li>
+        <li><a href="/status" class="nav-link active" data-i18n="nav_status">Status & Uptime</a></li>
+        <li><a href="/docs" class="nav-link" data-i18n="nav_docs">Architektur & Doku</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="/status" id="header-health-pill" class="health-indicator-btn">
+          <div class="pulse-dot"></div>
+          <span id="header-health-text" data-i18n="pill_checking">Prüfe Infrastruktur...</span>
+        </a>
+        <button id="btn-theme" class="ctrl-btn" onclick="toggleTheme()" data-i18n="btn_theme_light">☀️ Hell</button>
+        <button id="btn-lang" class="ctrl-btn" onclick="toggleLanguage()">🇬🇧 EN</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <header class="page-header">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h1 data-i18n="status_page_title">Infrastruktur Status & Uptime</h1>
+          <p data-i18n="status_page_subtitle">Echtzeit-Health-Checks und 7-Tage Verfügbarkeitshistorie aller Container, gestützt durch PostgreSQL.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <a href="/api/status" target="_blank" class="ctrl-btn" style="text-decoration: none;" data-i18n="btn_raw_json">📄 Raw JSON</a>
+          <button class="ctrl-btn" onclick="fetchLiveData()">
+            <span id="refresh-icon">🔄</span> <span data-i18n="btn_check_now">Jetzt prüfen</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="section-title">
+      <span data-i18n="section_monitors_title">Service-Monitore (PostgreSQL Historie)</span>
+      <span id="last-updated" style="font-size: 0.8rem; font-weight: normal; text-transform: none; color: var(--text-muted);"></span>
+    </div>
+
+    <div class="monitors-grid" id="monitors-container">
+      <div style="color: var(--text-muted); padding: 2rem;" data-i18n="loading_history">Lade Monitore und PostgreSQL-Historie...</div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <span data-i18n="footer_platform">Krümel AI Platform &bull; Port 1512</span>
+      <div class="footer-links">
+        <a href="/api/health" target="_blank" class="footer-link" data-i18n="footer_health_api">Health Endpoint (JSON ↗)</a>
+        <span>&bull;</span>
+        <a href="/chat" class="footer-link" data-i18n="nav_chat">💬 Chat</a>
+        <span>&bull;</span>
+        <a href="/" class="footer-link" data-i18n="nav_overview">Übersicht</a>
+        <span>&bull;</span>
+        <a href="/docs" class="footer-link" data-i18n="nav_docs">Architektur & Doku</a>
+      </div>
+      <span>PostgreSQL 16 &bull; LiteLLM &bull; Langfuse &bull; Qdrant &bull; n8n</span>
+    </div>
+  </footer>
+
+  <!-- DETAILS MODAL -->
+  <div id="details-modal" class="modal-backdrop" onclick="closeModal(event)">
+    <div class="modal-window" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <h2 id="modal-service-name" style="font-size: 1.4rem;">Service Details</h2>
+          <p id="modal-service-role" style="color: var(--text-muted); font-size: 0.88rem;"></p>
+        </div>
+        <button class="btn-close" onclick="closeModal()">&times;</button>
+      </div>
+
+      <div class="modal-stats-grid">
+        <div class="stat-box">
+          <div class="stat-label" data-i18n="modal_kpi_uptime">Uptime (7 Tage)</div>
+          <div class="stat-value" id="modal-uptime-7d" style="color: var(--accent-green);">100%</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label" data-i18n="modal_kpi_latency">Durchschnitts-Latenz</div>
+          <div class="stat-value" id="modal-avg-latency" style="color: var(--accent-blue);">14 ms</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label" data-i18n="modal_kpi_status">Aktueller Status</div>
+          <div class="stat-value" id="modal-current-status">ONLINE</div>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top: 1.5rem;">
+        <span data-i18n="modal_incidents_title">Incident- & Störungshistorie</span>
+      </div>
+      <div id="modal-incidents-container">
+        <p style="color: var(--text-muted); font-size: 0.85rem;" data-i18n="modal_no_incidents">Keine Ausfälle in den letzten 7 Tagen verzeichnet.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+  <script>
+    let servicesCache = [];
+    const serviceIcons = {
+      litellm: '🛡️',
+      langfuse: '📈',
+      n8n: '⚡',
+      qdrant: '🗄️',
+      ollama: '🦙',
+      postgres: '💾',
+      redis: '⚡',
+      clickhouse: '📊',
+      minio: '🪣'
+    };
+
+    async function fetchLiveData() {
+      const icon = document.getElementById('refresh-icon');
+      if (icon) icon.style.transform = 'rotate(180deg)';
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        servicesCache = data.services;
+        renderMonitors(data.services);
+
+        const updated = document.getElementById('last-updated');
+        if (updated) {
+          const now = new Date();
+          updated.innerText = `${I18N[currentLang].last_updated}: ${now.toLocaleTimeString()}`;
+        }
+      } catch (err) {
+        console.error('Error fetching live data:', err);
+      } finally {
+        if (icon) setTimeout(() => { icon.style.transform = 'none'; }, 300);
+      }
+    }
+
+    function renderMonitors(services) {
+      const container = document.getElementById('monitors-container');
+      let html = '';
+
+      for (const svc of services) {
+        const icon = serviceIcons[svc.id] || '⚙️';
+        const isOnline = svc.status === 'online';
+        const statusColorClass = isOnline ? '' : 'offline';
+        const latencyText = isOnline ? `${svc.latency_ms} ms` : 'Offline';
+        const roleText = (I18N[currentLang] && I18N[currentLang][`svc_${svc.id}_role`]) || svc.role;
+        const loadingText = (I18N[currentLang] && I18N[currentLang].badge_loading) || 'Lade...';
+        const uptimeLabel = (I18N[currentLang] && I18N[currentLang].uptime_word) || 'Uptime';
+
+        html += `
+          <div class="monitor-card" id="card-${svc.id}">
+            <div class="card-header-line">
+              <div class="service-info">
+                <div class="service-icon">${icon}</div>
+                <div>
+                  <div class="service-title">${svc.name}</div>
+                  <div class="service-meta">${roleText} &bull; :${svc.port}</div>
+                </div>
+              </div>
+              <div class="kpi-group">
+                <div class="uptime-badge ${statusColorClass}" id="badge-${svc.id}">${loadingText}</div>
+                <div class="latency-meta">${latencyText}</div>
+              </div>
+            </div>
+
+            <!-- StatusCake Timeline Bar -->
+            <div class="timeline-container">
+              <div class="timeline-labels">
+                <span>${I18N[currentLang].before_7d}</span>
+                <span id="timeline-pct-${svc.id}">100% ${uptimeLabel}</span>
+                <span>${I18N[currentLang].today}</span>
+              </div>
+              <div class="timeline-bars" id="bars-${svc.id}">
+                <div class="timeline-bar"></div>
+              </div>
+            </div>
+
+            <div class="card-bottom-actions">
+              ${svc.external_url ? `<a href="${svc.external_url}" target="_blank" class="link-open">${I18N[currentLang].open_portal}</a>` : `<span style="color: var(--text-muted); font-size: 0.8rem;">${I18N[currentLang].backend_service}</span>`}
+              <button class="btn-details" onclick="openDetails('${svc.id}')">${I18N[currentLang].view_details}</button>
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+      services.forEach(svc => loadServiceHistory(svc.id));
+    }
+
+    async function loadServiceHistory(serviceId) {
+      try {
+        const res = await fetch(`/api/history?service=${serviceId}&range=7d`);
+        const data = await res.json();
+
+        const badge = document.getElementById(`badge-${serviceId}`);
+        const pctLabel = document.getElementById(`timeline-pct-${serviceId}`);
+        const barsContainer = document.getElementById(`bars-${serviceId}`);
+        const uptimeLabel = (I18N[currentLang] && I18N[currentLang].uptime_word) || 'Uptime';
+
+        if (badge) {
+          badge.innerText = `${data.uptime_pct}%`;
+          if (data.uptime_pct < 95.0) badge.className = 'uptime-badge offline';
+          else if (data.uptime_pct < 99.5) badge.className = 'uptime-badge degraded';
+          else badge.className = 'uptime-badge';
+        }
+
+        if (pctLabel) {
+          pctLabel.innerText = `${data.uptime_pct}% ${uptimeLabel}`;
+        }
+
+        if (barsContainer && data.buckets) {
+          let barsHtml = '';
+          data.buckets.forEach(b => {
+            const timeStr = new Date(b.timestamp).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const tooltipInfo = `${timeStr} | ${b.uptime_pct}% ${uptimeLabel} | ${b.avg_latency_ms}ms`;
+            barsHtml += `
+              <div class="timeline-bar ${b.status}" 
+                   onmouseenter="showTooltip(event, '${tooltipInfo}')" 
+                   onmouseleave="hideTooltip()"></div>
+            `;
+          });
+          barsContainer.innerHTML = barsHtml || '<div class="timeline-bar empty"></div>';
+        }
+      } catch (e) {
+        console.error('Failed to load history for', serviceId, e);
+      }
+    }
+
+    async function openDetails(serviceId) {
+      const modal = document.getElementById('details-modal');
+      const svc = servicesCache.find(s => s.id === serviceId) || { name: serviceId, role: '' };
+      const roleText = (I18N[currentLang] && I18N[currentLang][`svc_${svc.id}_role`]) || svc.role;
+      
+      document.getElementById('modal-service-name').innerText = svc.name;
+      document.getElementById('modal-service-role').innerText = roleText + (svc.port ? ` (Port ${svc.port})` : '');
+
+      try {
+        const res = await fetch(`/api/history?service=${serviceId}&range=7d`);
+        const data = await res.json();
+
+        const isOnline = svc.status === 'online';
+        const statusText = isOnline ? (I18N[currentLang].status_online || 'ONLINE') : (I18N[currentLang].status_offline || 'OFFLINE');
+
+        document.getElementById('modal-uptime-7d').innerText = `${data.uptime_pct}%`;
+        document.getElementById('modal-avg-latency').innerText = `${data.avg_latency_ms} ms`;
+        document.getElementById('modal-current-status').innerText = statusText;
+        document.getElementById('modal-current-status').style.color = isOnline ? 'var(--accent-green)' : 'var(--accent-rose)';
+
+        const incidentsContainer = document.getElementById('modal-incidents-container');
+        if (data.incidents && data.incidents.length > 0) {
+          let tableHtml = `
+            <table class="incident-table">
+              <thead>
+                <tr>
+                  <th>${I18N[currentLang].modal_th_time}</th>
+                  <th>${I18N[currentLang].modal_th_status}</th>
+                  <th>${I18N[currentLang].modal_th_latency}</th>
+                  <th>${I18N[currentLang].modal_th_details}</th>
+                </tr>
+              </thead>
+              <tbody>
+          `;
+          data.incidents.forEach(inc => {
+            const timeFormatted = new Date(inc.timestamp).toLocaleString();
+            tableHtml += `
+              <tr>
+                <td style="font-family: var(--font-mono);">${timeFormatted}</td>
+                <td style="color: var(--accent-rose); font-weight: 600;">${inc.status.toUpperCase()}</td>
+                <td style="font-family: var(--font-mono);">${inc.latency_ms ? inc.latency_ms + 'ms' : '-'}</td>
+                <td>${inc.details || I18N[currentLang].modal_conn_error}</td>
+              </tr>
+            `;
+          });
+          tableHtml += '</tbody></table>';
+          incidentsContainer.innerHTML = tableHtml;
+        } else {
+          incidentsContainer.innerHTML = `<p style="color: var(--accent-green); font-size: 0.9rem; padding: 1rem 0;">✓ ${I18N[currentLang].modal_no_incidents}</p>`;
+        }
+      } catch (err) {
+        console.error('Error loading modal details:', err);
+      }
+
+      modal.classList.add('open');
+    }
+
+    function closeModal(event) {
+      if (event && event.target !== document.getElementById('details-modal') && !event.target.classList.contains('btn-close')) {
+        return;
+      }
+      document.getElementById('details-modal').classList.remove('open');
+    }
+
+    window.onLanguageChange = function() {
+      if (servicesCache && servicesCache.length > 0) {
+        renderMonitors(servicesCache);
+      }
+    };
+
+    fetchLiveData();
+    setInterval(fetchLiveData, 10000);
+  </script>
+</body>
+</html>

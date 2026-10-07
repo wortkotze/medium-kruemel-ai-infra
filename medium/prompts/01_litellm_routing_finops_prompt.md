@@ -1,0 +1,61 @@
+# Gemini Prompt: Part 1 – The FinOps Shield with LiteLLM (English Edition)
+
+> **Instructions for Google Gemini:**  
+> Copy and paste the entire block below into Google Gemini (e.g., Gemini Advanced / 1.5 Pro / 2.0).  
+> Gemini will generate a comprehensive, publication-ready Medium article in English.
+
+---
+
+```markdown
+You are a Principal AI Infrastructure Architect and FinOps Specialist for Enterprise Cloud & GenAI Deployments.
+
+Write an in-depth, hands-on technical Medium article in English focused on slashing LLM inference costs and achieving intelligent, multi-tier model routing using LiteLLM Proxy.
+
+## Article Metadata
+- **Suggested Title:** Sashing 90% of LLM Costs with Zero Code Changes: The FinOps Blueprint with LiteLLM & Virtual Keys
+- **Suggested Subtitle:** How we decoupled agent code from commercial AI providers, combined local Ollama models with automatic cloud fallbacks, and enforced hard monthly budget caps.
+- **Target Audience:** FinOps Engineers, CTOs, AI Platform Leads, Python/Backend Developers.
+- **Tone of Voice:** Incisive, architecture-first, pragmatic, packed with configuration examples and real-world numbers.
+- **Medium Tags:** FinOps, LLM, Open Source, LiteLLM, Ollama, Python, Cloud Cost
+
+---
+
+## Core Thesis & Storytelling
+1. **The Trap of Direct Provider API Calls:**
+   - When 5 autonomous agents run iterative loops, invoking tools and repeatedly calling OpenAI or Anthropic directly, API bills skyrocket within hours.
+   - Even worse: What happens during an OpenAI outage or rate-limit spike? The entire platform halts.
+2. **The Gateway Layer (LiteLLM):**
+   - Agents **never** directly connect to proprietary endpoints.
+   - Agents only request abstract semantic tiers: `local-general`, `local-coder`, `smart-reasoner`.
+3. **The "Zero Code Change" Superpower (The Holy Grail):**
+   - The agent developer writes Python once with generic model targets.
+   - The platform/FinOps team changes model providers, fallback chains, timeouts, and budget limits in a single `models.yaml` file — **without modifying or rebuilding a single container or line of agent code!**
+
+---
+
+## Technical Deep-Dives & Code Snippets
+1. **Local-First with Cloud Fallbacks (The $0.00 Strategy):**
+   - Explain the tiered router strategy in `models.yaml`:
+     - Tier 1: Local Ollama / vLLM (`llama3.1:8b` or `qwen2.5-coder:7b`) on developer Mac or bare-metal GPU server. Cost: **$0.00**.
+     - Tier 2 (Automatic Fallback on timeout/downtime): Cheap, high-speed cloud model (`deepseek-chat`, `gpt-4o-mini`, or `claude-3-5-haiku`).
+     - Tier 3: Flagship model (`claude-3-7-sonnet`, `o3-mini`) only invoked for high-reasoning tasks.
+2. **Semantic Caching with Redis:**
+   - How repetitive queries or standard research prompts return cached results instantly (<15ms latency, **0 tokens billed**).
+3. **Virtual Keys & Hard Budget Quotas:**
+   - Every agent is issued a unique Virtual Key (e.g. `sk-agent-coder`, `sk-agent-devops`).
+   - Token usage and spend are persisted in real-time to PostgreSQL.
+   - Enforce monthly budgets (e.g. $10/month for Coder, $5/month for DevOps) with automated soft alerts and hard-stops.
+
+---
+
+## Screenshot Integration
+`![Krümel AI Hub Landing Page with central Gateway and Proxy integration](medium/screenshots/01_kruemel_hub_overview.png)`
+*Caption: "Centralized Gateway Architecture: LiteLLM manages virtual keys, budget quotas, and routing rules centrally for all containerized agents."*
+
+---
+
+## Key Takeaways
+- Why direct API calls in agent graphs are a dangerous enterprise anti-pattern.
+- How local-first routing combined with transparent cloud fallbacks saves up to 90% in inference costs.
+- How virtual keys bring multi-tenant cost accountability and auditability to enterprise AI stacks.
+```

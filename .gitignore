@@ -1,0 +1,29 @@
+# Secrets & Environment
+.env
+
+# Backups
+backups/
+
+# Logs
+*.log
+logs/
+
+# LiteLLM caches & database
+litellm_proxy_*.db
+*.db
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+
+config/infra_contract.json

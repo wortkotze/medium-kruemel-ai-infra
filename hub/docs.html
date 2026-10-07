@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="alternate icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/favicon.png">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    .docs-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .docs-section h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .docs-section p {
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    /* Visual Architecture Flow System */
+    .arch-flow-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin: 1.5rem 0 2rem;
+    }
+
+    .arch-tier {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 1.25rem;
+      position: relative;
+    }
+
+    .arch-tier.gateway-hero {
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      background: linear-gradient(180deg, rgba(37, 99, 235, 0.05) 0%, var(--bg-surface) 100%);
+      box-shadow: 0 0 15px rgba(37, 99, 235, 0.08);
+    }
+
+    .arch-tier-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.85rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .arch-tier-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .arch-tier-meta {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .arch-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .arch-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .arch-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      .arch-grid-2, .arch-grid-3, .arch-grid-4 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .arch-node {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      transition: all 0.15s ease;
+    }
+
+    .arch-node:hover {
+      border-color: var(--accent-blue);
+    }
+
+    .arch-node-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .arch-node-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .arch-node-badge {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--accent-green);
+      background: rgba(16, 185, 129, 0.1);
+      padding: 0.15rem 0.45rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .arch-node-role {
+      font-size: 0.8rem;
+      color: var(--accent-blue);
+      font-weight: 500;
+    }
+
+    .arch-node-desc {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+
+    .arch-node-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.3rem;
+    }
+
+    .arch-node-pill {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 0.15rem 0.4rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+    }
+
+    .arch-gateway-features {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    @media (max-width: 900px) {
+      .arch-gateway-features {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .arch-gw-col {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem;
+    }
+
+    .arch-gw-col-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .arch-gw-col-desc {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .arch-connector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 0.4rem 0;
+    }
+
+    .arch-connector::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, var(--accent-blue) 0%, var(--accent-green) 100%);
+      opacity: 0.4;
+    }
+
+    .arch-connector-badge {
+      position: relative;
+      z-index: 2;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 0.25rem 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      box-shadow: var(--shadow-card);
+    }
+
+    .component-spec-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1.25rem;
+    }
+
+    .component-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 1.35rem;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.15s ease;
+    }
+
+    .component-card:hover {
+      border-color: var(--border-focus);
+      background: var(--bg-surface-elevated);
+    }
+
+    .comp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.65rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+
+    .comp-name {
+      font-weight: 700;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .comp-port {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-blue);
+      background: rgba(37, 99, 235, 0.1);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .comp-role {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--accent-green);
+      margin-bottom: 0.5rem;
+    }
+
+    .comp-desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-bottom: 0.95rem;
+      flex-grow: 1;
+    }
+
+    .comp-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .comp-tag {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-color);
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+    }
+  </style>
+  <script>
+    (function() {
+      var l = localStorage.getItem("kruemel_lang") || "de";
+      document.documentElement.setAttribute("lang", l);
+      var t = localStorage.getItem("kruemel_theme") || "dark";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body>
+  <div id="global-tooltip"></div>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <a href="/" class="brand-link">
+        <span class="brand-logo">🍪</span>
+        <span class="brand-title">Krümel AI</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link" data-i18n="nav_overview">Übersicht</a></li>
+        <li><a href="/chat" class="nav-link" data-i18n="nav_chat">💬 Chat</a></li>
+        <li><a href="/agents" class="nav-link" data-i18n="nav_agents">🤖 Agenten</a></li>
+        <li><a href="/status" class="nav-link" data-i18n="nav_status">Status & Uptime</a></li>
+        <li><a href="/docs" class="nav-link active" data-i18n="nav_docs">Architektur & Doku</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="/status" id="header-health-pill" class="health-indicator-btn">
+          <div class="pulse-dot"></div>
+          <span id="header-health-text" data-i18n="pill_checking">Prüfe Infrastruktur...</span>
+        </a>
+        <button id="btn-theme" class="ctrl-btn" onclick="toggleTheme()" data-i18n="btn_theme_light">☀️ Hell</button>
+        <button id="btn-lang" class="ctrl-btn" onclick="toggleLanguage()">🇬🇧 EN</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <header class="page-header">
+      <h1 data-i18n="docs_page_title">Systemarchitektur & Komponenten-Handbuch</h1>
+      <p data-i18n="docs_page_subtitle">Detaillierte technische Dokumentation der Rollen, Aufgaben und Interaktionen aller Dienste im Krümel AI Stack.</p>
+    </header>
+
+    <!-- ARCHITECTURE FLOW SECTION -->
+    <section class="docs-section">
+      <h2 data-i18n="docs_architecture_title">Gesamtarchitektur & Datenflüsse</h2>
+      <p data-i18n="docs_architecture_desc">
+        Der Krümel AI Stack trennt strikt zwischen <strong>Infrastruktur & Governance (kruemel-ai-infra)</strong> und <strong>Agenten-Orchestrierung (kruemel-ai-agents / n8n)</strong>. Alle Aufrufe laufen über ein zentrales Sicherheits-Gateway (LiteLLM) und werden transparent durch Langfuse auditiert.
+      </p>
+
+      <!-- VISUAL ARCHITECTURE FLOW -->
+      <div class="arch-flow-diagram">
+        <!-- Tier 1: Orchestration & Client Layer -->
+        <div class="arch-tier">
+          <div class="arch-tier-header">
+            <span class="arch-tier-title"><span data-i18n="tier1_title">01 Orchestrierung & Agenten-Schicht</span></span>
+            <span class="arch-tier-meta" data-i18n="tier1_meta">Client & Execution Layer</span>
+          </div>
+          <div class="arch-grid-3">
+            <div class="arch-node">
+              <div class="arch-node-top">
+                <span class="arch-node-name">🤖 kruemel-ai-agents</span>
+                <span class="arch-node-badge">uv / Python 3.11</span>
+              </div>
+              <div class="arch-node-role" data-i18n="tier1_node1_role">LangGraph StateGraph Maschinen</div>
+              <p class="arch-node-desc" data-i18n="tier1_node1_desc">Autonome Multi-Agenten mit strukturiertem State, Tool Calling, Human-in-the-Loop & Langfuse Instrumentierung.</p>
+              <div class="arch-node-pills">
+                <span class="arch-node-pill">StateGraph</span>
+                <span class="arch-node-pill">Tool Calling</span>
+                <span class="arch-node-pill">uv Venv</span>
+                <span class="arch-node-pill">DevOps Agent</span>
+              </div>
+            </div>
+
+            <div class="arch-node">
+              <div class="arch-node-top">
+                <span class="arch-node-name">⚡ n8n Workflow Engine</span>
+                <span class="arch-node-badge">Port :5678</span>
+              </div>
+              <div class="arch-node-role" data-i18n="tier1_node2_role">Visuelle Low-Code Automation</div>
+              <p class="arch-node-desc" data-i18n="tier1_node2_desc">Visuelle Event-Pipelines, Webhook Trigger, automatisierte Datenflüsse und nahtlose Anbindung an Qdrant & LiteLLM.</p>
+              <div class="arch-node-pills">
+                <span class="arch-node-pill">400+ Nodes</span>
+                <span class="arch-node-pill">Webhooks</span>
+                <span class="arch-node-pill">AI Agent Canvas</span>
+                <span class="arch-node-pill">Postgres Store</span>
+              </div>
+            </div>
+
+            <div class="arch-node">
+              <div class="arch-node-top">
+                <span class="arch-node-name">💬 Krümel AI Chat</span>
+                <span class="arch-node-badge">Port :1513 &bull; WebUI</span>
+              </div>
+              <div class="arch-node-role" data-i18n="tier1_node3_role">Human-to-AI Chat Workspace</div>
+              <p class="arch-node-desc" data-i18n="tier1_node3_desc">Direkte Interaktion mit lokalen und Cloud-Modellen. Dateiupload, RAG, Prompt-Templates & Modellauswahl.</p>
+              <div class="arch-node-pills">
+                <span class="arch-node-pill">Open WebUI</span>
+                <span class="arch-node-pill">RAG Uploads</span>
+                <span class="arch-node-pill">Multi-Model</span>
+                <span class="arch-node-pill">LiteLLM Stream</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tier 1b: Agent Tool Execution & Sandbox Tier -->
+        <div class="arch-tier" style="margin-top: 1rem;">
+          <div class="arch-tier-header">
+            <span class="arch-tier-title"><span data-i18n="tier1b_title">01b Agent Tool-Execution & Sandbox-Schicht</span></span>
+            <span class="arch-tier-meta" data-i18n="tier1b_meta">Tool Calling & Runtime Environment</span>
+          </div>
+          <div class="arch-grid-3">
+            <div class="arch-node">
+              <div class="arch-node-top">
+                <span class="arch-node-name">🔍 SearXNG Meta-Search</span>
+                <span class="arch-node-badge">Port :1514 &bull; JSON</span>
+              </div>
+              <div class="arch-node-role" data-i18n="tier1b_node0_role">Lokale Web-Suchmaschine</div>
+              <p class="arch-node-desc" data-i18n="tier1b_node0_desc">Aggregiert Google, Bing, DuckDuckGo & ArXiv ohne Tracking. Stellt Agenten eine unlimitierte JSON-Such-API bereit.</p>
+              <div class="arch-node-pills">
+                <span class="arch-node-pill">Meta-Search</span>
+                <span class="arch-node-pill">JSON API</span>
+                <span class="arch-node-pill">No Tracking</span>
+                <span class="arch-node-pill">Multi-Engine</span>
+              </div>
+            </div>
+
+            <div class="arch-node">
+              <div class="arch-node-top">
+                <span class="arch-node-name">🌐 Browserless Chromium</span>
+                <span class="arch-node-badge">Port :1516</span>
+              </div>
+              <div class="arch-node-role" data-i18n="tier1b_node1_role">Headless Browser Automation</div>
+              <p class="arch-node-desc" data-i18n="tier1b_node1_desc">Vollwertiges Chromium für autonome Web-Recherchen, Screenshot-Erfassung und dynamisches Scraping komplexer Web-Apps.</p>
+              <div class="arch-node-pills">
+                <span class="arch-node-pill">Playwright CDP</span>
+                <span class="arch-node-pill">REST /content</span>
+                <span class="arch-node-pill">Screenshots</span>
+                <span class="arch-node-pill">Docker Isolierung</span>
+              </div>
+            </div>
+
+            <div class="arch-node">
+              <div class="arch-node-top">
+                <span class="arch-node-name">⚡ Code Sandbox Runtime</span>
+                <span class="arch-node-badge">Port :1517</span>
+              </div>
+              <div class="arch-node-role" data-i18n="tier1b_node2_role">Isolierte Code-Ausführung</div>
+              <p class="arch-node-desc" data-i18n="tier1b_node2_desc">Sichere Sandbox-Ausführung von Python- und Shell-Code für Agenten ohne Zugriff auf das Host-Dateisystem.</p>
+              <div class="arch-node-pills">
+                <span class="arch-node-pill">Non-Root (UID 1000)</span>
+                <span class="arch-node-pill">RAM Limit: 512MB</span>
+                <span class="arch-node-pill">Timeout Enforced</span>
+                <span class="arch-node-pill">Python 3.11</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connector 1 -->
+        <div class="arch-connector">
+          <div class="arch-connector-badge">
+            <span data-i18n="connector1_text">⬇ OpenAI REST Protokoll (/v1/chat/completions) &bull; Port :4000</span>
+          </div>
+        </div>
+
+        <!-- Tier 2: AI Governance & Gateway -->
+        <div class="arch-tier gateway-hero">
+          <div class="arch-tier-header">
+            <span class="arch-tier-title"><span data-i18n="tier2_title">02 Governance, Security & Model Routing</span></span>
+            <span class="arch-tier-meta" data-i18n="tier2_meta">Zentraler Kontrollpunkt</span>
+          </div>
+          <div class="arch-node" style="background: transparent; border: none; padding: 0;">
+            <div class="arch-node-top">
+              <span class="arch-node-name" style="font-size: 1.1rem;">🛡️ LiteLLM Proxy Gateway</span>
+              <span class="arch-node-badge">Port :4000 &bull; Virtual Keys</span>
+            </div>
+            <div class="arch-node-role" style="font-size: 0.88rem;" data-i18n="tier2_gw_role">Zentrale Kontrollinstanz für alle ein- und ausgehenden LLM-Anfragen</div>
+            
+            <div class="arch-gateway-features">
+              <div class="arch-gw-col">
+                <div class="arch-gw-col-title" data-i18n="tier2_col1_title">🔑 RBAC & Virtuelle Keys</div>
+                <div class="arch-gw-col-desc" data-i18n="tier2_col1_desc">Keine echten API-Keys im Code; dedizierte virtuelle Tokens für jeden Agenten (z. B. <code>key-agent-devops</code>).</div>
+              </div>
+              <div class="arch-gw-col">
+                <div class="arch-gw-col-title" data-i18n="tier2_col2_title">🔒 PII-Maskierung & Safety</div>
+                <div class="arch-gw-col-desc" data-i18n="tier2_col2_desc">Automatisches Redigieren von Passwörtern, E-Mails und sensiblen Kundendaten vor der Modell-Inferenz.</div>
+              </div>
+              <div class="arch-gw-col">
+                <div class="arch-gw-col-title" data-i18n="tier2_col3_title">💰 Token- & Spend-Budgets</div>
+                <div class="arch-gw-col-desc" data-i18n="tier2_col3_desc">Echtzeit-Tracking und Budget-Limits pro Agent, Modell und Team zur strikten Kostenkontrolle.</div>
+              </div>
+              <div class="arch-gw-col">
+                <div class="arch-gw-col-title" data-i18n="tier2_col4_title">🔀 Intelligentes Routing</div>
+                <div class="arch-gw-col-desc" data-i18n="tier2_col4_desc">Local-First (Ollama auf Apple Silicon) mit automatischem Fallback auf Cloud-Modelle (OpenRouter).</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connector 2 -->
+        <div class="arch-connector">
+          <div class="arch-connector-badge">
+            <span data-i18n="connector2_text">⬇ Audited Inference &bull; Distributed Traces &bull; Vector Memory Pipelines</span>
+          </div>
+        </div>
+
+        <!-- Tier 3: Inferenz, Observability & Vector DB -->
+        <div class="arch-tier">
+          <div class="arch-tier-header">
+            <span class="arch-tier-title"><span data-i18n="tier3_title">03 Inferenz, Observability & Semantisches Gedächtnis</span></span>
+            <span class="arch-tier-meta" data-i18n="tier3_meta">Core Execution & Telemetry</span>
+          </div>
+          <div class="arch-grid-4">
+            <div class="arch-node">
+              <div class="arch-node-top">
+                <span class="arch-node-name">📈 Langfuse Observability</span>
+                <span class="arch-node-badge">Port :3000</span>
+              </div>
+              <div class="arch-node-role" data-i18n="tier3_node1_role">Prompt-Tracing & Metriken</div>
+              <p class="arch-node-desc" data-i18n="tier3_node1_desc">End-to-End Tracing aller Agentenschritte, Prompt-Versionierung, Latenzmessung und Kostenanalyse.</p>
+              <div class="arch-node-pills">
+                <span class="arch-node-pill">ClickHouse OLAP</span>
+                <span class="arch-node-pill">MinIO S3</span>
+                <span class="arch-node-pill">Trace Auditing</span>
+              </div>
+            </div>
+
+            <div class="arch-node">
+              <div class="arch-node-top">
+                <span class="arch-node-name">🦙 Ollama Local Engine</span>
+                <span class="arch-node-badge">Port :11434</span>
+              </div>
+              <div class="arch-node-role" data-i18n="tier3_node2_role">Apple Silicon GPU Inferenz</div>
+              <p class="arch-node-desc" data-i18n="tier3_node2_desc">On-Premise Inferenz auf dem Mac Host (Metal GPU). Qwen 2.5 Coder, Llama 3.1 & Nomic Embeddings mit 0% Datenabfluss.</p>
+              <div class="arch-node-pills">
+                <span class="arch-node-pill">Metal Acceleration</span>
+                <span class="arch-node-pill">Qwen 2.5 Coder</span>
+                <span class="arch-node-pill">0 Cloud Leak</span>
+              </div>
+            </div>
+
+            <div class="arch-node">
+              <div class="arch-node-top">
+                <span class="arch-node-name">🗄️ Qdrant Vector Engine</span>
+                <span class="arch-node-badge">Port :6333 / 6334</span>
+              </div>
+              <div class="arch-node-role" data-i18n="tier3_node3_role">Vektorspeicher & RAG</div>
+              <p class="arch-node-desc" data-i18n="tier3_node3_desc">In Rust geschriebene Hochleistungs-Vektordatenbank mit HNSW-Index für semantische Suche und Agent-Gedächtnis.</p>
+              <div class="arch-node-pills">
+                <span class="arch-node-pill">HNSW Index</span>
+                <span class="arch-node-pill">gRPC / REST</span>
+                <span class="arch-node-pill">Payload Filtering</span>
+              </div>
+            </div>
+
+            <div class="arch-node">
+              <div class="arch-node-top">
+                <span class="arch-node-name">🕸️ Memgraph Knowledge Graph</span>
+                <span class="arch-node-badge">Port :7687 / :1515</span>
+              </div>
+              <div class="arch-node-role" data-i18n="tier3_node4_role">In-Memory Graph & Relationen</div>
+              <p class="arch-node-desc" data-i18n="tier3_node4_desc">C++ In-Memory Graphdatenbank mit Cypher/Bolt. Speichert Entitäten, Relationen und Topologien für Multi-Hop GraphRAG.</p>
+              <div class="arch-node-pills">
+                <span class="arch-node-pill">Bolt / Cypher</span>
+                <span class="arch-node-pill">Memgraph Lab</span>
+                <span class="arch-node-pill">GraphRAG</span>
+                <span class="arch-node-pill">C++ Engine</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connector 3 -->
+        <div class="arch-connector">
+          <div class="arch-connector-badge">
+            <span data-i18n="connector3_text">⬇ Interne Docker-Netzwerke (litellm-net) &bull; Persistente Volumes</span>
+          </div>
+        </div>
+
+        <!-- Tier 4: Infrastruktur & Persistenz -->
+        <div class="arch-tier">
+          <div class="arch-tier-header">
+            <span class="arch-tier-title"><span data-i18n="tier4_title">04 Infrastruktur & Enterprise-Persistenz</span></span>
+            <span class="arch-tier-meta" data-i18n="tier4_meta">State, Queues & Analytics</span>
+          </div>
+          <div class="arch-grid-4">
+            <div class="arch-node">
+              <div class="arch-node-top">
+                <span class="arch-node-name">💾 PostgreSQL 16</span>
+                <span class="arch-node-badge">Port :5432</span>
+              </div>
+              <div class="arch-node-role" data-i18n="tier4_node1_role">Relationale Datenbank</div>
+              <p class="arch-node-desc" data-i18n="tier4_node1_desc">Zentraler Speicher für LiteLLM Keys, Langfuse Metadaten, n8n Workflows und Hub-Uptime-Logs.</p>
+              <div class="arch-node-pills">
+                <span class="arch-node-pill">Multi-Database</span>
+                <span class="arch-node-pill">make backup</span>
+              </div>
+            </div>
+
+            <div class="arch-node">
+              <div class="arch-node-top">
+                <span class="arch-node-name">⚡ Redis Cache</span>
+                <span class="arch-node-badge">Port :6379</span>
+              </div>
+              <div class="arch-node-role" data-i18n="tier4_node2_role">In-Memory Cache & Broker</div>
+              <p class="arch-node-desc" data-i18n="tier4_node2_desc">Zero-Latency Exact Match Prompt-Caching für LiteLLM und Task-Queues für Hintergrund-Worker.</p>
+              <div class="arch-node-pills">
+                <span class="arch-node-pill">LRU Cache</span>
+                <span class="arch-node-pill">Task Queue</span>
+              </div>
+            </div>
+
+            <div class="arch-node">
+              <div class="arch-node-top">
+                <span class="arch-node-name">📊 ClickHouse OLAP</span>
+                <span class="arch-node-badge">Port :8123</span>
+              </div>
+              <div class="arch-node-role" data-i18n="tier4_node3_role">Columnar Telemetry DB</div>
+              <p class="arch-node-desc" data-i18n="tier4_node3_desc">High-Speed Aggregationen über Millionen von Observation- und Telemetrie-Events in Langfuse.</p>
+              <div class="arch-node-pills">
+                <span class="arch-node-pill">OLAP Engine</span>
+                <span class="arch-node-pill">Realtime Tracing</span>
+              </div>
+            </div>
+
+            <div class="arch-node">
+              <div class="arch-node-top">
+                <span class="arch-node-name">🪣 MinIO S3 Storage</span>
+                <span class="arch-node-badge">Port :9091</span>
+              </div>
+              <div class="arch-node-role" data-i18n="tier4_node4_role">S3 Objektspeicher</div>
+              <p class="arch-node-desc" data-i18n="tier4_node4_desc">Sichert Trace-Payloads, Ausführungs-Screenshots, PDFs und Mediendateien lokal im Container-Netzwerk.</p>
+              <div class="arch-node-pills">
+                <span class="arch-node-pill">S3 API</span>
+                <span class="arch-node-pill">Blob Storage</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPONENT CATALOG -->
+    <section class="docs-section">
+      <h2 data-i18n="docs_components_title">Detaillierte Komponenten-Übersicht</h2>
+      <p data-i18n="docs_components_subtitle">Jede Komponente erfüllt eine dedizierte Aufgabe im Gesamtstack und ist über isolierte Docker-Netzwerke abgesichert:</p>
+
+      <div class="component-spec-grid">
+        <!-- Open WebUI -->
+        <div class="component-card">
+          <div class="comp-header">
+            <span class="comp-name">💬 Krümel AI Chat (Open WebUI)</span>
+            <span class="comp-port">Port 1513</span>
+          </div>
+          <div class="comp-role" data-i18n="comp_webui_role">Human-to-AI Chat Interface & RAG Workspace</div>
+          <p class="comp-desc" data-i18n="comp_webui_desc">
+            Stellt eine moderne Benutzeroberfläche nach Art von ChatGPT und Gemini bereit. Ermöglicht interaktive Chats, Prompt-Verwaltung, RAG-Dateiuploads und fliegenden Modellwechsel – 100 % auditiert via LiteLLM & Langfuse.
+          </p>
+          <div class="comp-tags">
+            <span class="comp-tag">Open WebUI</span>
+            <span class="comp-tag">RAG Embeddings</span>
+            <span class="comp-tag">Model Switcher</span>
+            <span class="comp-tag">Streaming UI</span>
+          </div>
+        </div>
+
+        <!-- LiteLLM -->
+        <div class="component-card">
+          <div class="comp-header">
+            <span class="comp-name">🛡️ LiteLLM Gateway</span>
+            <span class="comp-port">Port 4000</span>
+          </div>
+          <div class="comp-role" data-i18n="comp_litellm_role">Governance, Security & Model-Router</div>
+          <p class="comp-desc" data-i18n="comp_litellm_desc">
+            Bietet eine einheitliche Schnittstelle nach OpenAI-Standard. Verhindert direkte API-Key-Herausgabe an Agenten durch virtuelle Tokens, schützt vor Datenlecks (PII Redaction) und routet Anfragen automatisch auf lokale oder Cloud-Modelle.
+          </p>
+          <div class="comp-tags">
+            <span class="comp-tag">Reverse Proxy</span>
+            <span class="comp-tag">RBAC</span>
+            <span class="comp-tag">A2A AgentCard</span>
+            <span class="comp-tag">Postgres + Redis</span>
+          </div>
+        </div>
+
+        <!-- Langfuse -->
+        <div class="component-card">
+          <div class="comp-header">
+            <span class="comp-name">📈 Langfuse Observability</span>
+            <span class="comp-port">Port 3000</span>
+          </div>
+          <div class="comp-role" data-i18n="comp_langfuse_role">Application Tracing & Metriken</div>
+          <p class="comp-desc" data-i18n="comp_langfuse_desc">
+            Open-Source LLM-Engineering Plattform. Zeichnet jeden Prompt, jeden Tool-Call und jede Latenz auf. Ermöglicht systematische Evaluierungen, Kostenanalysen und Fehlerdiagnosen über komplexe Multi-Agenten-Graphen.
+          </p>
+          <div class="comp-tags">
+            <span class="comp-tag">Next.js UI</span>
+            <span class="comp-tag">ClickHouse</span>
+            <span class="comp-tag">MinIO S3</span>
+            <span class="comp-tag">Distributed Tracing</span>
+          </div>
+        </div>
+
+        <!-- n8n -->
+        <div class="component-card">
+          <div class="comp-header">
+            <span class="comp-name">⚡ n8n Automation Engine</span>
+            <span class="comp-port">Port 5678</span>
+          </div>
+          <div class="comp-role" data-i18n="comp_n8n_role">Low-Code Workflow & Agent Canvas</div>
+          <p class="comp-desc" data-i18n="comp_n8n_desc">
+            Ermöglicht das visuelle Verknüpfen von Hunderten von Diensten mit KI-Modellen. Nutzt den n8n AI Agent Node zur Anbindung an LiteLLM und Qdrant. Automatisierte Trigger, Webhooks und periodische Aufgaben.
+          </p>
+          <div class="comp-tags">
+            <span class="comp-tag">Node.js</span>
+            <span class="comp-tag">Visual Canvas</span>
+            <span class="comp-tag">Postgres DB</span>
+            <span class="comp-tag">Cron / Webhooks</span>
+          </div>
+        </div>
+
+        <!-- Qdrant -->
+        <div class="component-card">
+          <div class="comp-header">
+            <span class="comp-name">🗄️ Qdrant Vector Engine</span>
+            <span class="comp-port">Port 6333 / 6334</span>
+          </div>
+          <div class="comp-role" data-i18n="comp_qdrant_role">Semantisches Gedächtnis & RAG</div>
+          <p class="comp-desc" data-i18n="comp_qdrant_desc">
+            In Rust geschriebene Hochleistungs-Vektordatenbank. Speichert Dokument-Embeddings und Agent-Erinnerungen. Bietet extrem schnelle Ähnlichkeitssuche mittels HNSW-Algorithmus mit Payload-Filtering.
+          </p>
+          <div class="comp-tags">
+            <span class="comp-tag">Rust</span>
+            <span class="comp-tag">HNSW Index</span>
+            <span class="comp-tag">REST & gRPC</span>
+            <span class="comp-tag">Embeddings</span>
+          </div>
+        </div>
+
+        <!-- Memgraph -->
+        <div class="component-card">
+          <div class="comp-header">
+            <span class="comp-name">🕸️ Memgraph Knowledge Graph</span>
+            <span class="comp-port">Port 7687 / 1515</span>
+          </div>
+          <div class="comp-role" data-i18n="comp_memgraph_role">In-Memory Graph & Multi-Hop Reasoning</div>
+          <p class="comp-desc" data-i18n="comp_memgraph_desc">
+            Ultra-schnelle C++ Graphdatenbank mit nativer Cypher/Bolt-Unterstützung und Memgraph Lab Visualizer. Ermöglicht GraphRAG, Beziehungsanalysen und Entitäts-Gedächtnis für autonome Agenten.
+          </p>
+          <div class="comp-tags">
+            <span class="comp-tag">C++ Engine</span>
+            <span class="comp-tag">Cypher / Bolt</span>
+            <span class="comp-tag">Memgraph Lab</span>
+            <span class="comp-tag">GraphRAG</span>
+          </div>
+        </div>
+
+        <!-- Browserless Chromium -->
+        <div class="component-card">
+          <div class="comp-header">
+            <span class="comp-name">🌐 Browserless Chromium</span>
+            <span class="comp-port">Port 1516</span>
+          </div>
+          <div class="comp-role" data-i18n="comp_browserless_role">Headless Browser Automation & Web Scraping</div>
+          <p class="comp-desc" data-i18n="comp_browserless_desc">
+            Headless Chromium-Browser mit WebSocket CDP- und REST-API. Ermöglicht Agenten das eigenständige Surfen im Web, Interaktion mit dynamischen Webseiten, PDF-Generierung und Screenshot-Analysen.
+          </p>
+          <div class="comp-tags">
+            <span class="comp-tag">Chromium Headless</span>
+            <span class="comp-tag">Playwright / CDP</span>
+            <span class="comp-tag">Web Scraping</span>
+            <span class="comp-tag">REST API</span>
+          </div>
+        </div>
+
+        <!-- Code Execution Sandbox -->
+        <div class="component-card">
+          <div class="comp-header">
+            <span class="comp-name">⚡ Code Sandbox Runtime</span>
+            <span class="comp-port">Port 1517</span>
+          </div>
+          <div class="comp-role" data-i18n="comp_sandbox_role">Isolierte Code Execution Sandbox</div>
+          <p class="comp-desc" data-i18n="comp_sandbox_desc">
+            Kurzlebige und abgesicherte Python 3.11 / Shell-Laufzeitumgebung. Agenten können dynamischen Code generieren und ausführen lassen, geschützt durch strikte Timeouts, Memory-Limits und Non-Root Isolation.
+          </p>
+          <div class="comp-tags">
+            <span class="comp-tag">Python 3.11</span>
+            <span class="comp-tag">Non-Root (UID 1000)</span>
+            <span class="comp-tag">RAM Limit 512M</span>
+            <span class="comp-tag">Subprocess Isolation</span>
+          </div>
+        </div>
+
+        <!-- SearXNG -->
+        <div class="component-card">
+          <div class="comp-header">
+            <span class="comp-name">🔍 SearXNG Meta-Search</span>
+            <span class="comp-port">Port 1514</span>
+          </div>
+          <div class="comp-role" data-i18n="comp_searxng_role">Lokale, privacy-fokussierte Meta-Suchmaschine</div>
+          <p class="comp-desc" data-i18n="comp_searxng_desc">
+            Aggregiert Suchergebnisse aus Google, Bing, DuckDuckGo, Wikipedia und ArXiv ohne Tracking oder Werbeanzeigen. Stellt eine hochperformante JSON-API für autonome Research-Agenten bereit.
+          </p>
+          <div class="comp-tags">
+            <span class="comp-tag">Meta-Search</span>
+            <span class="comp-tag">JSON Output</span>
+            <span class="comp-tag">Zero Tracking</span>
+            <span class="comp-tag">Port 1514</span>
+          </div>
+        </div>
+
+        <!-- Ollama -->
+        <div class="component-card">
+          <div class="comp-header">
+            <span class="comp-name">🦙 Ollama Local Engine</span>
+            <span class="comp-port">Port 11434</span>
+          </div>
+          <div class="comp-role" data-i18n="comp_ollama_role">Native Apple Silicon Inferenz</div>
+          <p class="comp-desc" data-i18n="comp_ollama_desc">
+            Läuft direkt auf dem Mac-Host und nutzt die Unified Memory Architektur (GPU/Neural Engine). Stellt Open-Source Modelle wie Qwen 2.5 Coder und Llama 3.1 mit maximaler Lese-/Schreibgeschwindigkeit bereit.
+          </p>
+          <div class="comp-tags">
+            <span class="comp-tag">Metal GPU</span>
+            <span class="comp-tag">Zero Cloud Data</span>
+            <span class="comp-tag">GGUF Quantization</span>
+          </div>
+        </div>
+
+        <!-- PostgreSQL 16 -->
+        <div class="component-card">
+          <div class="comp-header">
+            <span class="comp-name">💾 PostgreSQL Database</span>
+            <span class="comp-port">Port 5432</span>
+          </div>
+          <div class="comp-role" data-i18n="comp_postgres_role">Zentrale relationale Persistenz</div>
+          <p class="comp-desc" data-i18n="comp_postgres_desc">
+            Das Rückgrat für Konfigurationen, User-Accounts, n8n-Workflows und Hub-Statusdaten. Wird konsistent über automatisierte Backups (<code>make backup</code>) als komprimierter SQL-Dump gesichert.
+          </p>
+          <div class="comp-tags">
+            <span class="comp-tag">Alpine 16</span>
+            <span class="comp-tag">Multi-DB Setup</span>
+            <span class="comp-tag">Automated Snapshots</span>
+          </div>
+        </div>
+
+        <!-- Redis -->
+        <div class="component-card">
+          <div class="comp-header">
+            <span class="comp-name">⚡ Redis Cache & Queue</span>
+            <span class="comp-port">Port 6379</span>
+          </div>
+          <div class="comp-role" data-i18n="comp_redis_role">In-Memory Cache & Message Broker</div>
+          <p class="comp-desc" data-i18n="comp_redis_desc">
+            Reduziert LLM-Kosten und Latenzen durch Caching identischer Anfragen auf Proxy-Ebene. Dient gleichzeitig als Job-Queue für Hintergrund-Worker und asynchrone Berechnungen.
+          </p>
+          <div class="comp-tags">
+            <span class="comp-tag">LRU Cache</span>
+            <span class="comp-tag">Zero Latency</span>
+            <span class="comp-tag">Redis 7</span>
+          </div>
+        </div>
+
+        <!-- ClickHouse -->
+        <div class="component-card">
+          <div class="comp-header">
+            <span class="comp-name">📊 ClickHouse OLAP</span>
+            <span class="comp-port">Port 8123</span>
+          </div>
+          <div class="comp-role" data-i18n="comp_clickhouse_role">Spaltenorientierte Telemetrie-Analytik</div>
+          <p class="comp-desc" data-i18n="comp_clickhouse_desc">
+            Spezialisiert auf schnelle SQL-Abfragen über Millionen von Telemetrie- und Observation-Events in Langfuse. Bietet unvergleichliche Aggregations-Performance bei minimalem Speicherbedarf.
+          </p>
+          <div class="comp-tags">
+            <span class="comp-tag">OLAP</span>
+            <span class="comp-tag">Columnar Storage</span>
+            <span class="comp-tag">Realtime Analytics</span>
+          </div>
+        </div>
+
+        <!-- MinIO -->
+        <div class="component-card">
+          <div class="comp-header">
+            <span class="comp-name">🪣 MinIO S3 Storage</span>
+            <span class="comp-port">Port 9091</span>
+          </div>
+          <div class="comp-role" data-i18n="comp_minio_role">S3-kompatibler Objektspeicher</div>
+          <p class="comp-desc" data-i18n="comp_minio_desc">
+            Sichert große Payloads, Medien-Dateien, Ausführungs-Screenshots und Event-Batches aus Langfuse vollkommen lokal und isoliert im Container-Netzwerk.
+          </p>
+          <div class="comp-tags">
+            <span class="comp-tag">S3 API</span>
+            <span class="comp-tag">Blob Storage</span>
+            <span class="comp-tag">Internal Endpoints</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AGENT TOOLING & EXECUTION: BROWSERLESS & SANDBOX -->
+    <section class="docs-section">
+      <h2 data-i18n="docs_agent_tools_title">🛠️ Agent Tooling & Execution: Web Browsing & Sichere Code-Sandbox</h2>
+      <p data-i18n="docs_agent_tools_intro">
+        Moderne autonome Agenten benötigen die Fähigkeit, über reine Textgenerierung hinauszugehen: Sie müssen im Web recherchieren und generierten Programmcode sicher testen können.
+      </p>
+
+      <div class="arch-grid-3" style="margin: 1.5rem 0;">
+        <!-- SearXNG Info -->
+        <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.25rem;">
+          <div style="font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; color: var(--accent-orange, #f59e0b);">
+            <span>🔍 SearXNG Meta-Search (:1514)</span>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+            Aggregiert Google, Bing, DuckDuckGo & ArXiv ohne Tracking. Stellt Agenten eine unlimitierte JSON-Such-API bereit.
+          </p>
+          <ul style="font-size: 0.82rem; color: var(--text-muted); list-style: disc; margin-left: 1.2rem; line-height: 1.6;">
+            <li><strong>GET /search?q=...&format=json:</strong> Saubere Link- & Snippet-Liste</li>
+            <li><strong>Multi-Engine:</strong> Parallelabfrage von 10+ Suchanbietern</li>
+            <li><strong>Keine API-Keys:</strong> 100% lokal & privat ohne Pay-per-Query</li>
+            <li><strong>Port 1514:</strong> Konsistent im Krümel Hub Web-Bereich</li>
+          </ul>
+        </div>
+
+        <!-- Browserless Info -->
+        <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.25rem;">
+          <div style="font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; color: var(--accent-blue);">
+            <span>🌐 Browserless Chromium (:1516)</span>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+            Ermöglicht Agenten das Headless-Surfen auf dynamischen Websites (React, Vue, SPA) über standardisierte REST-Endpunkte oder WebSocket-CDP.
+          </p>
+          <ul style="font-size: 0.82rem; color: var(--text-muted); list-style: disc; margin-left: 1.2rem; line-height: 1.6;">
+            <li><strong>POST /content:</strong> Rendert JavaScript & liefert bereinigten DOM</li>
+            <li><strong>POST /screenshot:</strong> Visuelle Screenshots für Vision-Modelle</li>
+            <li><strong>POST /pdf:</strong> Konvertiert Webdokumente für RAG-Pipelines</li>
+            <li><strong>WebSocket CDP:</strong> Direkte Playwright-Anbindung via <code>ws://localhost:1516</code></li>
+          </ul>
+        </div>
+
+        <!-- Sandbox Info -->
+        <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.25rem;">
+          <div style="font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; color: var(--accent-green);">
+            <span>⚡ Code Sandbox Runtime (:1517)</span>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+            Abgesicherte, kurzlebige Ausführungsumgebung für Python- und Shell-Code. Verhindert Ausbrüche und schützt den Host.
+          </p>
+          <ul style="font-size: 0.82rem; color: var(--text-muted); list-style: disc; margin-left: 1.2rem; line-height: 1.6;">
+            <li><strong>POST /run:</strong> Führt Code aus und liefert stdout, stderr & Exit-Code</li>
+            <li><strong>Non-Root:</strong> Läuft unter unprivilegierter UID 1000</li>
+            <li><strong>Ressourcen-Limits:</strong> Strikte RAM-Limits (512MB) & Timeouts</li>
+            <li><strong>Isolierte Workspaces:</strong> Flüchtiges <code>/tmp</code> mit Bereinigung</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="snippet-panel" style="margin-top: 1.5rem;">
+        <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.75rem; color: var(--text-primary);">Vollständige autonome Agent-Toolchain in Python:</div>
+        <pre><code style="color: var(--accent-blue);">import requests
+
+# Schritt 1: Im Web recherchieren (SearXNG JSON API :1514)
+search_res = requests.get("http://localhost:1514/search", params={"q": "LiteLLM Proxy GitHub", "format": "json"}).json()
+top_url = search_res["results"][0]["url"]
+
+# Schritt 2: Deep-Content der Webseite extrahieren (Browserless :1516)
+page_html = requests.post("http://localhost:1516/content", json={"url": top_url}).text
+
+# Schritt 3: Generierten Berechnungs-/Transformationscode sicher ausführen (Sandbox :1517)
+exec_res = requests.post("http://localhost:1517/run", json={
+    "code": "print(f'Recherche erfolgreich abgeschlossen auf: {top_url}')",
+    "language": "python",
+    "timeout": 10
+}).json()
+print("Sandbox Output:", exec_res.get("stdout"))</code></pre>
+      </div>
+    </section>
+
+    <!-- DUAL MEMORY: VECTOR VS KNOWLEDGE GRAPH -->
+    <section class="docs-section">
+      <h2 data-i18n="docs_dual_memory_title">🧠 Dual-Memory Architektur: Vektor-Store (Qdrant) vs. Knowledge Graph (Memgraph)</h2>
+      <p data-i18n="docs_dual_memory_intro">
+        Autonome Agenten und RAG-Pipelines benötigen zwei fundamentale, komplementäre Speicherformen. Bei Krümel AI kombinieren wir semantische Vektorsuche mit strukturiertem Beziehungs-Reasoning zu einem hybriden <strong>GraphRAG</strong>-System.
+      </p>
+
+      <div class="table-responsive" style="margin: 1.5rem 0; overflow-x: auto;">
+        <table class="docs-table" style="width: 100%; border-collapse: collapse; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+          <thead>
+            <tr style="background: var(--bg-surface-elevated); border-bottom: 1px solid var(--border-color); text-align: left;">
+              <th style="padding: 0.85rem 1rem; color: var(--text-primary);" data-i18n="th_dimension">Dimension</th>
+              <th style="padding: 0.85rem 1rem; color: var(--accent-blue);" data-i18n="th_qdrant">🗄️ Qdrant (Vektor-Store)</th>
+              <th style="padding: 0.85rem 1rem; color: var(--accent-green);" data-i18n="th_memgraph">🕸️ Memgraph (Knowledge Graph)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 0.85rem 1rem; font-weight: 600;" data-i18n="td_paradigm">Paradigma</td>
+              <td style="padding: 0.85rem 1rem;" data-i18n="td_qdrant_paradigm">Dichte Vektor-Einbettungen (Embeddings)</td>
+              <td style="padding: 0.85rem 1rem;" data-i18n="td_memgraph_paradigm">Labeled Property Graph (Knoten, Kanten, Properties)</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 0.85rem 1rem; font-weight: 600;" data-i18n="td_strength">Kernstärke</td>
+              <td style="padding: 0.85rem 1rem;" data-i18n="td_qdrant_strength">Unstrukturierte Ähnlichkeitssuche ("Finde relevante Textabschnitte")</td>
+              <td style="padding: 0.85rem 1rem;" data-i18n="td_memgraph_strength">Multi-Hop Reasoning ("Wie hängen A, B und C zusammen?")</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 0.85rem 1rem; font-weight: 600;" data-i18n="td_query">Abfragesprache</td>
+              <td style="padding: 0.85rem 1rem;" data-i18n="td_qdrant_query">Kosinus-Ähnlichkeit, Dot-Product, HNSW REST/gRPC</td>
+              <td style="padding: 0.85rem 1rem;" data-i18n="td_memgraph_query">Cypher Query Language (OpenCypher via Bolt :7687)</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 0.85rem 1rem; font-weight: 600;" data-i18n="td_usecases">Typische Use-Cases</td>
+              <td style="padding: 0.85rem 1rem;" data-i18n="td_qdrant_usecases">Semantischer Dokument-Upload im Chat, Code-Chunk-Suche, FAQ-Matching</td>
+              <td style="padding: 0.85rem 1rem;" data-i18n="td_memgraph_usecases">Infrastruktur-Topologie, Abhängigkeiten, Agenten-Ontologien, Fakten-Tripel</td>
+            </tr>
+            <tr>
+              <td style="padding: 0.85rem 1rem; font-weight: 600;" data-i18n="td_hybrid">Hybrid GraphRAG</td>
+              <td style="padding: 0.85rem 1rem;" colspan="2" data-i18n="td_hybrid_desc">
+                <strong>Der Goldstandard:</strong> Qdrant findet die relevanten Einstiegsknoten via semantischer Ähnlichkeit. Memgraph folgt den Kanten 1–2 Hops tief, um den vollständigen strukturierten Beziehungskontext ohne Halluzinationen ans LLM zu übergeben.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="snippet-panel" style="margin-top: 1.5rem;">
+        <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.75rem; color: var(--text-primary);" data-i18n="docs_cypher_example_title">Cypher Abfragebeispiel in Python (LangGraph & kruemel-ai-agents):</div>
+        <pre><code style="color: var(--accent-blue);">from neo4j import GraphDatabase
+
+# Verbindung zum lokalen Memgraph Bolt-Port (:7687)
+driver = GraphDatabase.driver("bolt://localhost:7687", auth=("", ""))
+
+def query_dependencies(tx, service_name):
+    query = """
+    MATCH (s:Service {name: $name})-[:DEPENDS_ON*1..2]->(dep:Service)
+    RETURN s.name AS service, collect(dep.name) AS dependencies
+    """
+    return [record.data() for record in tx.run(query, name=service_name)]
+
+with driver.session() as session:
+    result = session.execute_read(query_dependencies, "litellm")
+    print(result)</code></pre>
+      </div>
+    <!-- MULTI-REPO ARCHITECTURE: INFRA VS AGENTS -->
+    <section class="docs-section">
+      <h2>🤝 Multi-Repo Architektur: <code>kruemel-ai-infra</code> ⟷ <code>kruemel-ai-agents</code></h2>
+      <p>
+        Um Wartbarkeit, Deployment und Code-Qualität zu maximieren, sind Infrastruktur und Agentenlogik in zwei getrennte Repositories aufgeteilt. Ein automatisierter Systemvertrag verhindert Schnittstellenbrüche.
+      </p>
+
+      <div class="arch-grid-2" style="margin: 1.5rem 0;">
+        <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.25rem;">
+          <div style="font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; color: var(--accent-blue);">
+            <span>🏛️ kruemel-ai-infra (Plattform & Runtime)</span>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+            Hostet alle 15 Container, Datenbanken, LiteLLM RBAC Gateways, Vektorspeicher und FastMCP Server.
+          </p>
+          <ul style="font-size: 0.82rem; color: var(--text-muted); list-style: disc; margin-left: 1.2rem; line-height: 1.6;">
+            <li>Verwaltet Ports (:1512–:1517), Docker Compose und Health-Monitoring</li>
+            <li>Generiert Virtual Keys mit strikter Modell- und Tool-Isolation</li>
+            <li>Führt 12 domänenspezifische FastMCP Server in <code>scripts/mcp/</code> aus</li>
+            <li>Exportiert den zentralen Vertrag via <code>make sync-agents</code></li>
+          </ul>
+        </div>
+
+        <div style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.25rem;">
+          <div style="font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; color: var(--accent-green);">
+            <span>🤖 kruemel-ai-agents (Logik & Workflows)</span>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+            Beherbergt die LangGraph Multi-Agenten-Pipelines für die 5 Rollen (PO, Architect, Coder, Researcher, DevOps).
+          </p>
+          <ul style="font-size: 0.82rem; color: var(--text-muted); list-style: disc; margin-left: 1.2rem; line-height: 1.6;">
+            <li>Spricht ausschließlich mit LiteLLM (<code>http://localhost:4000/v1</code>)</li>
+            <li>Nutzt rollenspezifische Keys (<code>PO_API_KEY</code>, <code>CODER_API_KEY</code>)</li>
+            <li>Keine hardgecodeten Datenbank- oder Tool-Ports im Python-Code</li>
+            <li>Synchronisiert seine <code>.env</code> vollautomatisch aus der Infra</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="snippet-panel" style="margin-top: 1.5rem;">
+        <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.75rem; color: var(--text-primary);">Synchronisationsbefehl in <code>kruemel-ai-infra</code>:</div>
+        <pre><code style="color: var(--accent-green);"># Liest Virtual Keys aus LiteLLM, schreibt config/infra_contract.json
+# und aktualisiert ../kruemel-ai-agents/.env direkt:
+make sync-agents
+
+# Tipp: In Antigravity beide Ordner im Multi-Root Workspace öffnen:
+# File -> Add Folder to Workspace... -> kruemel-ai-agents</code></pre>
+      </div>
+
+      <!-- Agent Gateway Sub-Section -->
+      <div style="margin-top: 2rem; background: var(--bg-surface-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.5rem;">
+        <h3 style="margin-top: 0; font-size: 1.15rem; color: var(--accent-blue); display: flex; align-items: center; gap: 0.5rem;">
+          <span>🌐 Central Agent Registry & Chat Gateway (:1518)</span>
+        </h3>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+          Das Agent Gateway auf <code>http://localhost:1518</code> dient als dynamische Brücke zwischen <code>kruemel-ai-agents</code> und dem Chat-Frontend (Open WebUI auf <code>:1513</code>):
+        </p>
+        <ul style="font-size: 0.85rem; color: var(--text-muted); list-style: disc; margin-left: 1.2rem; line-height: 1.6;">
+          <li><b>Dynamische Registrierung:</b> Beim Start eines Python-Workers in <code>kruemel-ai-agents</code> ruft dieser <code>POST /api/registry/register</code> auf.</li>
+          <li><b>Heartbeat & Healthchecks:</b> Alle 20 Sekunden sendet der Worker <code>POST /api/registry/heartbeat</code>. Bleibt der Heartbeat länger als 45s aus, schaltet das Gateway den Agenten automatisch in den Standby-Modus.</li>
+          <li><b>Open WebUI & Chat-Dispatcher:</b> Open WebUI ruft <code>GET /v1/models</code> vom Gateway ab. Chat-Nachrichten an <code>agent-po</code>, <code>agent-researcher</code> etc. werden via SSE-Stream an den Worker weitergeleitet oder transparent über LiteLLM abgewickelt.</li>
+        </ul>
+        <pre class="code-block" style="margin-top: 1rem;"><code style="color: #38bdf8;"># Registrierungs-Payload eines Python-Workers (kruemel-ai-agents -> Gateway :1518):
+POST http://localhost:1518/api/registry/register
+{
+  "id": "agent-researcher",
+  "name": "Deep Research & Intelligence Agent",
+  "role": "Researcher",
+  "endpoint": "http://host.containers.internal:8004",
+  "tools": ["searxng_mcp", "browserless_mcp", "qdrant_mcp"],
+  "model": "local-general"
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- DISASTER RECOVERY & GOVERNANCE -->
+    <section class="docs-section">
+      <h2 data-i18n="docs_backup_title">🛡️ Backup, Wiederherstellung & Desaster Recovery</h2>
+      <p data-i18n="docs_backup_desc">
+        Alle Systeme sind auf 100 % Reproduzierbarkeit ausgelegt. Docker-Volumes, Konfigurationen und Datenbanken lassen sich jederzeit mit einem Befehl sichern:
+      </p>
+      <div class="snippet-panel" style="margin-top: 1rem;">
+        <pre><code style="color: var(--accent-green);" data-i18n="backup_code_snippet"># Vollständiges Snapshot-Backup aller PostgreSQL-Datenbanken & Konfigurationen:
+make backup
+
+# Snapshot-Archive werden unter backups/backup_YYYYMMDD_HHMMSS.tar.gz abgelegt.
+# Es werden stets die 7 neuesten Snapshots aufbewahrt (automatische Rotation).</code></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <span data-i18n="footer_platform">Krümel AI Platform &bull; Port 1512</span>
+      <div class="footer-links">
+        <a href="/api/health" target="_blank" class="footer-link" data-i18n="footer_health_api">Health Endpoint (JSON ↗)</a>
+        <span>&bull;</span>
+        <a href="/chat" class="footer-link" data-i18n="nav_chat">💬 Chat</a>
+        <span>&bull;</span>
+        <a href="/" class="footer-link" data-i18n="nav_overview">Übersicht</a>
+        <span>&bull;</span>
+        <a href="/status" class="footer-link" data-i18n="nav_status">Status & Uptime</a>
+      </div>
+      <span>PostgreSQL 16 &bull; LiteLLM &bull; Langfuse &bull; Qdrant &bull; n8n</span>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

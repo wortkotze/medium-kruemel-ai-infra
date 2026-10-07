@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Krümel AI | Multi-Agent Cockpit</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="alternate icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/favicon.png">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .agents-hero {
+      padding: 3rem 0 2rem;
+      border-bottom: 1px solid var(--border-color);
+      background: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.08), transparent 70%);
+    }
+    .agents-hud {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent-blue);
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      padding: 0.25rem 0.65rem;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .agent-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 1.5rem;
+      margin: 2.5rem 0 4rem;
+    }
+    .agent-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .agent-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(56, 189, 248, 0.4);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+    .agent-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .agent-icon-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+    .agent-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+    }
+    .agent-identity h3 {
+      font-size: 1.15rem;
+      margin: 0;
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+    .agent-id-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent-blue);
+      margin-top: 0.2rem;
+      display: block;
+    }
+    .agent-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.3rem 0.65rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+    .agent-status-badge.online {
+      background: rgba(34, 197, 94, 0.12);
+      border-color: rgba(34, 197, 94, 0.35);
+      color: #4ade80;
+    }
+    .agent-status-badge.online .status-dot {
+      background: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+    }
+    .agent-status-badge.standby {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+    }
+    .agent-status-badge.standby .status-dot {
+      background: #f59e0b;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+    .agent-desc {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+      flex-grow: 1;
+    }
+    .agent-meta-block {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .meta-label {
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .meta-val {
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+    }
+    .tools-tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.25rem;
+    }
+    .tool-chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      padding: 0.25rem 0.5rem;
+      background: rgba(168, 85, 247, 0.1);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      color: #c084fc;
+      border-radius: 4px;
+    }
+    .agent-actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: auto;
+    }
+    .btn-agent-chat {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1rem;
+      background: var(--accent-blue);
+      color: #0b0f19;
+      font-weight: 600;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .btn-agent-chat:hover {
+      opacity: 0.9;
+    }
+    .btn-agent-traces {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.65rem 0.85rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-size: 0.85rem;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-agent-traces:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .registry-info-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 4rem;
+    }
+    .code-snippet {
+      background: #090d16;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: #e2e8f0;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+  </style>
+  <script>
+    (function() {
+      var l = localStorage.getItem("kruemel_lang") || "de";
+      document.documentElement.setAttribute("lang", l);
+      var t = localStorage.getItem("kruemel_theme") || "dark";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body>
+  <div id="global-tooltip"></div>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <a href="/" class="brand-link">
+        <span class="brand-logo">🍪</span>
+        <span class="brand-title">Krümel AI</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Übersicht</a></li>
+        <li><a href="/chat" class="nav-link">💬 Chat</a></li>
+        <li><a href="/agents" class="nav-link active">🤖 Agenten</a></li>
+        <li><a href="/status" class="nav-link">Status & Uptime</a></li>
+        <li><a href="/docs" class="nav-link">Architektur & Doku</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="/status" id="header-health-pill" class="health-indicator-btn">
+          <div class="pulse-dot"></div>
+          <span id="header-health-text">Prüfe Infrastruktur...</span>
+        </a>
+        <button id="btn-theme" class="ctrl-btn" onclick="toggleTheme()">☀️ Hell</button>
+        <button id="btn-lang" class="ctrl-btn" onclick="toggleLanguage()">🇬🇧 EN</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="agents-hero">
+    <div class="container">
+      <div class="agents-hud">KRÜMEL_AI // MULTI-AGENT COCKPIT</div>
+      <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.75rem; letter-spacing: -0.02em;">
+        Autonome Rollen & Live-Registry
+      </h1>
+      <p style="color: var(--text-secondary); max-width: 780px; font-size: 1.05rem; line-height: 1.6;">
+        Zentrale Übersicht der 5 spezialisierten Agenten-Rollen aus <code style="color: var(--accent-blue);">kruemel-ai-agents</code>. 
+        Jeder Agent besitzt strikt isolierte MCP-Tools, Zugriff auf Langzeitgedächtnis (Qdrant) und Wissensgraphen (Memgraph) 
+        und kann direkt im Chat angesprochen werden.
+      </p>
+
+      <div style="display: flex; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap;">
+        <div>
+          <span style="display: block; font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">REGISTRIERTE ROLLEN</span>
+          <span style="font-size: 1.4rem; font-weight: 700; color: var(--text-primary);" id="stat-total-agents">5 Rollen</span>
+        </div>
+        <div>
+          <span style="display: block; font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">AKTIVE WORKER</span>
+          <span style="font-size: 1.4rem; font-weight: 700; color: #22c55e;" id="stat-online-agents">Prüfe...</span>
+        </div>
+        <div>
+          <span style="display: block; font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">AGENT GATEWAY</span>
+          <span style="font-size: 1.4rem; font-weight: 700; color: var(--accent-blue);">Port :1518</span>
+        </div>
+        <div>
+          <span style="display: block; font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">TRACING & EVALS</span>
+          <span style="font-size: 1.4rem; font-weight: 700; color: #c084fc;">Langfuse :3000</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Agent Cards Grid -->
+  <main class="container">
+    <div class="agent-grid">
+
+      <!-- 1. Product Owner Agent -->
+      <div class="agent-card" id="card-agent-po">
+        <div class="agent-card-top">
+          <div class="agent-icon-wrap">
+            <div class="agent-avatar">📋</div>
+            <div class="agent-identity">
+              <h3>Product Owner</h3>
+              <span class="agent-id-tag">agent-po</span>
+            </div>
+          </div>
+          <div class="agent-status-badge standby" id="status-agent-po">
+            <div class="status-dot"></div>
+            <span>Standby</span>
+          </div>
+        </div>
+        <p class="agent-desc">
+          Übersetzt Visionen in strukturierte PRDs, User Stories, MoSCoW-Priorisierungen und Akzeptanzkriterien.
+          Arbeitet isoliert in <code style="font-size: 0.8rem;">/workspace/docs/specs</code>.
+        </p>
+        <div class="agent-meta-block">
+          <div class="meta-row">
+            <span class="meta-label">Inferenz-Modell:</span>
+            <span class="meta-val">local-general (Ollama)</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Framework:</span>
+            <span class="meta-val">LangGraph StateGraph</span>
+          </div>
+        </div>
+        <div class="tools-tag-container">
+          <span class="tool-chip">spec_mcp</span>
+          <span class="tool-chip">qdrant_mcp</span>
+          <span class="tool-chip">memgraph_mcp</span>
+        </div>
+        <div class="agent-actions">
+          <a href="/chat" class="btn-agent-chat">💬 Im Chat ansprechen</a>
+          <a href="http://localhost:3000" target="_blank" class="btn-agent-traces" title="Langfuse Traces">Traces ↗</a>
+        </div>
+      </div>
+
+      <!-- 2. System Architect Agent -->
+      <div class="agent-card" id="card-agent-architect">
+        <div class="agent-card-top">
+          <div class="agent-icon-wrap">
+            <div class="agent-avatar">🏛️</div>
+            <div class="agent-identity">
+              <h3>System Architect</h3>
+              <span class="agent-id-tag">agent-architect</span>
+            </div>
+          </div>
+          <div class="agent-status-badge standby" id="status-agent-architect">
+            <div class="status-dot"></div>
+            <span>Standby</span>
+          </div>
+        </div>
+        <p class="agent-desc">
+          Entwirft Systemgrenzen, evaluiert Architekturentscheidungen (ADRs), modelliert Topologien im Wissensgraphen
+          und erstellt Mermaid-Diagramme in <code style="font-size: 0.8rem;">/workspace/docs/architecture</code>.
+        </p>
+        <div class="agent-meta-block">
+          <div class="meta-row">
+            <span class="meta-label">Inferenz-Modell:</span>
+            <span class="meta-val">local-general (Ollama)</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Framework:</span>
+            <span class="meta-val">LangGraph ReAct</span>
+          </div>
+        </div>
+        <div class="tools-tag-container">
+          <span class="tool-chip">architecture_mcp</span>
+          <span class="tool-chip">spec_mcp</span>
+          <span class="tool-chip">qdrant_mcp</span>
+          <span class="tool-chip">memgraph_mcp</span>
+        </div>
+        <div class="agent-actions">
+          <a href="/chat" class="btn-agent-chat">💬 Im Chat ansprechen</a>
+          <a href="http://localhost:3000" target="_blank" class="btn-agent-traces" title="Langfuse Traces">Traces ↗</a>
+        </div>
+      </div>
+
+      <!-- 3. Software Developer Agent -->
+      <div class="agent-card" id="card-agent-coder">
+        <div class="agent-card-top">
+          <div class="agent-icon-wrap">
+            <div class="agent-avatar">💻</div>
+            <div class="agent-identity">
+              <h3>Software Developer</h3>
+              <span class="agent-id-tag">agent-coder</span>
+            </div>
+          </div>
+          <div class="agent-status-badge standby" id="status-agent-coder">
+            <div class="status-dot"></div>
+            <span>Standby</span>
+          </div>
+        </div>
+        <p class="agent-desc">
+          Schreibt sauberen Python- & TypeScript-Code, führt Refactorings durch und testet Skripte sicher in der
+          isolierten Sandbox-Laufzeitumgebung (:1517).
+        </p>
+        <div class="agent-meta-block">
+          <div class="meta-row">
+            <span class="meta-label">Inferenz-Modell:</span>
+            <span class="meta-val">local-coder (qwen2.5-coder)</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Framework:</span>
+            <span class="meta-val">LangGraph CodeLoop</span>
+          </div>
+        </div>
+        <div class="tools-tag-container">
+          <span class="tool-chip">filesystem_mcp</span>
+          <span class="tool-chip">sandbox_mcp</span>
+          <span class="tool-chip">github_mcp</span>
+          <span class="tool-chip">qdrant_mcp</span>
+        </div>
+        <div class="agent-actions">
+          <a href="/chat" class="btn-agent-chat">💬 Im Chat ansprechen</a>
+          <a href="http://localhost:3000" target="_blank" class="btn-agent-traces" title="Langfuse Traces">Traces ↗</a>
+        </div>
+      </div>
+
+      <!-- 4. Deep Researcher Agent -->
+      <div class="agent-card" id="card-agent-researcher">
+        <div class="agent-card-top">
+          <div class="agent-icon-wrap">
+            <div class="agent-avatar">🔬</div>
+            <div class="agent-identity">
+              <h3>Deep Researcher</h3>
+              <span class="agent-id-tag">agent-researcher</span>
+            </div>
+          </div>
+          <div class="agent-status-badge standby" id="status-agent-researcher">
+            <div class="status-dot"></div>
+            <span>Standby</span>
+          </div>
+        </div>
+        <p class="agent-desc">
+          Führt lokale, werbefreie Web-Recherchen via SearXNG (:1514) durch, rendert SPAs mit Browserless Chromium (:1516)
+          und speichert extrahierte Paper im Qdrant Vektorspeicher.
+        </p>
+        <div class="agent-meta-block">
+          <div class="meta-row">
+            <span class="meta-label">Inferenz-Modell:</span>
+            <span class="meta-val">local-general (Ollama)</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Framework:</span>
+            <span class="meta-val">LangGraph WebSearch</span>
+          </div>
+        </div>
+        <div class="tools-tag-container">
+          <span class="tool-chip">searxng_mcp</span>
+          <span class="tool-chip">browserless_mcp</span>
+          <span class="tool-chip">qdrant_mcp</span>
+        </div>
+        <div class="agent-actions">
+          <a href="/chat" class="btn-agent-chat">💬 Im Chat ansprechen</a>
+          <a href="http://localhost:3000" target="_blank" class="btn-agent-traces" title="Langfuse Traces">Traces ↗</a>
+        </div>
+      </div>
+
+      <!-- 5. DevOps Automation Agent -->
+      <div class="agent-card" id="card-agent-devops">
+        <div class="agent-card-top">
+          <div class="agent-icon-wrap">
+            <div class="agent-avatar">🚀</div>
+            <div class="agent-identity">
+              <h3>DevOps & Infra</h3>
+              <span class="agent-id-tag">agent-devops</span>
+            </div>
+          </div>
+          <div class="agent-status-badge standby" id="status-agent-devops">
+            <div class="status-dot"></div>
+            <span>Standby</span>
+          </div>
+        </div>
+        <p class="agent-desc">
+          Überwacht Docker-Container, inspiziert LiteLLM Gateway Router, steuert Cloudflare DNS & Tunnels
+          und automatisiert FRITZ!Box Smart Home & Heimnetzwerk-Vorgänge.
+        </p>
+        <div class="agent-meta-block">
+          <div class="meta-row">
+            <span class="meta-label">Inferenz-Modell:</span>
+            <span class="meta-val">local-general (Ollama)</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Framework:</span>
+            <span class="meta-val">LangGraph InfraOps</span>
+          </div>
+        </div>
+        <div class="tools-tag-container">
+          <span class="tool-chip">docker_mcp</span>
+          <span class="tool-chip">litellm_mcp</span>
+          <span class="tool-chip">cloudflare_mcp</span>
+          <span class="tool-chip">fritzbox_mcp</span>
+          <span class="tool-chip">qdrant_mcp</span>
+          <span class="tool-chip">memgraph_mcp</span>
+        </div>
+        <div class="agent-actions">
+          <a href="/chat" class="btn-agent-chat">💬 Im Chat ansprechen</a>
+          <a href="http://localhost:3000" target="_blank" class="btn-agent-traces" title="Langfuse Traces">Traces ↗</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Multi-Repo Architecture & Registration Guide -->
+    <div class="registry-info-box">
+      <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem;">
+        🔌 Multi-Repo Integration: So registriert sich ein Agent am Gateway
+      </h3>
+      <p style="color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem;">
+        Wenn ein Worker im Repository <code style="color: var(--accent-blue);">kruemel-ai-agents</code> gestartet wird, 
+        meldet er sich mit einem simplen POST-Call am zentralen Agent Gateway (:1518) an. Das Gateway erkennt den Agenten sofort, 
+        zeigt ihn hier im Cockpit als <b style="color: #22c55e;">Online</b> an und leitet Chat-Nachrichten aus Open WebUI direkt per SSE an den Worker weiter.
+      </p>
+
+      <div class="code-snippet">
+# Python-Worker Startup Hook (in kruemel-ai-agents):
+import requests
+
+GATEWAY_URL = "http://localhost:1518/api/registry"
+
+# 1. Beim Start registrieren
+requests.post(f"{GATEWAY_URL}/register", json={
+    "id": "agent-researcher",
+    "name": "Deep Research & Intelligence Agent",
+    "role": "Researcher",
+    "endpoint": "http://host.containers.internal:8004",  # Lokaler Worker-Port
+    "tools": ["searxng_mcp", "browserless_mcp", "qdrant_mcp"],
+    "model": "local-general"
+})
+
+# 2. Heartbeat alle 20 Sekunden
+requests.post(f"{GATEWAY_URL}/heartbeat", json={"id": "agent-researcher"})
+      </div>
+
+      <div style="display: flex; gap: 1rem; align-items: center; margin-top: 1rem;">
+        <a href="http://localhost:1518/docs" target="_blank" class="matrix-btn secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+          📖 Gateway Swagger API Doku (:1518/docs) ↗
+        </a>
+        <a href="/docs" class="matrix-btn secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+          📚 Ausführliches Handbuch →
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Live Polling Script for Agent Registry -->
+  <script src="/app.js"></script>
+  <script>
+    async function updateAgentStatuses() {
+      try {
+        const res = await fetch('/api/agents');
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        const onlineCount = data.online_count || 0;
+        const totalCount = data.total_count || (data.agents ? data.agents.length : 5);
+
+        const onlineElem = document.getElementById('stat-online-agents');
+        if (onlineElem) onlineElem.textContent = onlineCount > 0 ? `${onlineCount} Online` : '0 (Standby-Modus)';
+
+        if (Array.isArray(data.agents)) {
+          data.agents.forEach(agent => {
+            const badge = document.getElementById(`status-${agent.id}`);
+            if (badge) {
+              if (agent.status === 'online') {
+                badge.className = 'agent-status-badge online';
+                badge.innerHTML = '<div class="status-dot"></div><span>Online</span>';
+              } else {
+                badge.className = 'agent-status-badge standby';
+                badge.innerHTML = '<div class="status-dot"></div><span>Standby</span>';
+              }
+            }
+          });
+        }
+      } catch (e) {
+        console.warn('Agent status fetch error:', e);
+      }
+    }
+
+    // Initial fetch & 5s interval
+    updateAgentStatuses();
+    setInterval(updateAgentStatuses, 5000);
+  </script>
+</body>
+</html>

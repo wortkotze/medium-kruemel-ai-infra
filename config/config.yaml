@@ -1,0 +1,720 @@
+# ──────────────────────────────────────────────
+# AUTO-GENERATED RUNTIME CONFIG
+# Source files: config/models.yaml, config/mcp_servers.yaml, config/agents.yaml, config/skills.yaml
+# ──────────────────────────────────────────────
+
+model_list:
+- model_name: local-general
+  litellm_params:
+    model: ollama/llama3.1:8b
+    api_base: http://host.containers.internal:11434
+    request_timeout: 90
+- model_name: local-general-fast
+  litellm_params:
+    model: ollama/llama3.1:8b
+    api_base: http://host.containers.internal:11434
+    request_timeout: 60
+- model_name: local-coder
+  litellm_params:
+    model: ollama/qwen2.5-coder:7b
+    api_base: http://host.containers.internal:11434
+    request_timeout: 90
+- model_name: local-coder-fast
+  litellm_params:
+    model: ollama/qwen2.5-coder:7b
+    api_base: http://host.containers.internal:11434
+    request_timeout: 60
+- model_name: local-small
+  litellm_params:
+    model: ollama/qwen2.5:1.5b
+    api_base: http://host.containers.internal:11434
+    request_timeout: 30
+- model_name: nomic-embed-text
+  litellm_params:
+    model: ollama/nomic-embed-text:latest
+    api_base: http://host.containers.internal:11434
+- model_name: llama3.1:8b
+  litellm_params:
+    model: ollama/llama3.1:8b
+    api_base: http://host.containers.internal:11434
+    request_timeout: 90
+- model_name: qwen2.5-coder:7b
+  litellm_params:
+    model: ollama/qwen2.5-coder:7b
+    api_base: http://host.containers.internal:11434
+    request_timeout: 90
+- model_name: qwen2.5:1.5b
+  litellm_params:
+    model: ollama/qwen2.5:1.5b
+    api_base: http://host.containers.internal:11434
+    request_timeout: 30
+- model_name: agent-po
+  litellm_params:
+    model: ollama/llama3.1:8b
+    api_base: http://host.containers.internal:11434
+- model_name: agent-architect
+  litellm_params:
+    model: ollama/llama3.1:8b
+    api_base: http://host.containers.internal:11434
+- model_name: agent-coder
+  litellm_params:
+    model: ollama/qwen2.5-coder:7b
+    api_base: http://host.containers.internal:11434
+- model_name: agent-devops
+  litellm_params:
+    model: ollama/llama3.1:8b
+    api_base: http://host.containers.internal:11434
+- model_name: agent-researcher
+  litellm_params:
+    model: ollama/llama3.1:8b
+    api_base: http://host.containers.internal:11434
+- model_name: smart-coder
+  litellm_params:
+    model: ollama/qwen2.5-coder:7b
+    api_base: http://host.containers.internal:11434
+    tpm: 100000
+    rpm: 1000
+- model_name: smart-general
+  litellm_params:
+    model: ollama/llama3.1:8b
+    api_base: http://host.containers.internal:11434
+    tpm: 100000
+    rpm: 1000
+router_settings:
+  routing_strategy: usage-based-routing
+  set_verbose: false
+  num_retries: 2
+  timeout: 90
+  allowed_fails: 2
+  cooldown_time: 60
+  fallbacks:
+  - smart-coder:
+    - local-coder-fast
+  - smart-general:
+    - local-general-fast
+  - local-coder:
+    - local-coder-fast
+  - local-general:
+    - local-general-fast
+mcp_servers:
+  litellm_mcp:
+    name: LiteLLM Gateway Management MCP
+    description: Manage models, inspect gateway health, query router analytics, and
+      create virtual API keys.
+    transport: stdio
+    command: python3
+    args:
+    - "/app/scripts/mcp/litellm_mcp.py"
+    environment:
+      LITELLM_API_BASE: http://localhost:4000
+      LITELLM_MASTER_KEY: os.environ/LITELLM_MASTER_KEY
+    timeout: 30
+    allowed_tools:
+    - list_gateway_models
+    - get_gateway_health
+    - test_gateway_completion
+    - generate_api_key
+  cloudflare_mcp:
+    name: Cloudflare Infrastructure MCP
+    description: Manage DNS, Cloudflare Tunnels, Zero Trust access policies, and Edge
+      Workers.
+    transport: stdio
+    command: python3
+    args:
+    - "/app/scripts/mcp/cloudflare_mcp.py"
+    environment:
+      CLOUDFLARE_API_TOKEN: os.environ/CLOUDFLARE_API_TOKEN
+      CLOUDFLARE_EMAIL: os.environ/CLOUDFLARE_EMAIL
+      CLOUDFLARE_ACCOUNT_ID: os.environ/CLOUDFLARE_ACCOUNT_ID
+    timeout: 30
+    allowed_tools:
+    - verify_token
+    - list_zones
+    - list_dns_records
+    - get_dns_record
+    - create_dns_record
+    - update_dns_record
+    - list_tunnels
+    - get_tunnel_status
+    - list_workers
+    disallowed_tools:
+    - delete_zone
+    - delete_tunnel
+  github_mcp:
+    name: GitHub Developer MCP
+    description: Safe repository inspection, code reading, PR review, and issue search.
+    transport: sse
+    url: https://mcp.github.com/sse
+    headers:
+      Authorization: Bearer os.environ/GITHUB_READONLY_TOKEN
+      Accept: application/vnd.github.v3+json
+      User-Agent: LiteLLM-A2A-Gateway
+    timeout: 45
+    allowed_tools:
+    - search_repositories
+    - get_file_contents
+    - list_commits
+    - get_issue
+    - list_issues
+    - list_pull_requests
+    - get_pull_request
+    - list_branches
+    disallowed_tools:
+    - create_issue
+    - create_pull_request
+    - delete_repository
+    - delete_branch
+    - force_push
+  github_devops_mcp:
+    name: GitHub DevOps & Automation MCP
+    description: Automated PR creation, issue triaging, and workflow dispatch.
+    transport: sse
+    url: https://mcp.github.com/sse
+    headers:
+      Authorization: Bearer os.environ/GITHUB_DEVOPS_TOKEN
+      Accept: application/vnd.github.v3+json
+      User-Agent: LiteLLM-A2A-Gateway
+    timeout: 60
+    allowed_tools:
+    - create_issue
+    - create_pull_request
+    - update_pull_request
+    - create_issue_comment
+    disallowed_tools:
+    - delete_repository
+    - delete_branch
+    - force_push
+  github_user_passthrough_mcp:
+    name: GitHub User Passthrough MCP
+    description: Forwards individual caller OAuth/PAT tokens per-request.
+    transport: sse
+    url: https://mcp.github.com/sse
+    forward_headers:
+    - Authorization
+    - X-GitHub-Token
+    timeout: 45
+  brave_search_mcp:
+    name: Brave Search MCP
+    description: Privacy-focused web search, news aggregation, and local entity retrieval.
+    transport: http
+    url: https://api.search.brave.com/res/v1/mcp
+    headers:
+      X-Subscription-Token: os.environ/BRAVE_API_KEY
+      Accept: application/json
+    timeout: 30
+    allowed_tools:
+    - web_search
+    - news_search
+    - summarize_url
+  google_search_mcp:
+    name: Google Serper MCP
+    description: Google Search index querying, knowledge graph queries, and web scraping.
+    transport: http
+    url: https://google.serper.dev/mcp
+    headers:
+      X-API-KEY: os.environ/SERPER_API_KEY
+      Content-Type: application/json
+    timeout: 30
+    allowed_tools:
+    - google_search
+    - scrape_webpage
+    - google_search_scholar
+  google_workspace_mcp:
+    name: Google Workspace & Drive MCP
+    description: Read, search, and manage Google Drive files, Google Docs, and Spreadsheets.
+    transport: http
+    url: https://workspace-mcp.googleapis.com/v1
+    headers:
+      Authorization: Bearer os.environ/GOOGLE_WORKSPACE_ACCESS_TOKEN
+      X-Goog-User-Project: os.environ/GOOGLE_PROJECT_ID
+    timeout: 60
+    allowed_tools:
+    - search_drive
+    - read_doc
+    - read_sheet
+    - list_folder_contents
+    - create_doc
+    - append_to_sheet
+    disallowed_tools:
+    - delete_file_permanently
+    - empty_trash
+    - change_file_ownership
+  filesystem_mcp:
+    name: Sandboxed Local Filesystem MCP
+    description: Safe file reading, writing, diffing, and searching inside the designated
+      workspace.
+    transport: stdio
+    command: python3
+    args:
+    - "/app/scripts/mcp/filesystem_mcp.py"
+    - "/workspace"
+    environment:
+      WORKSPACE_ROOT: "/workspace"
+    timeout: 30
+    allowed_tools:
+    - read_file
+    - write_file
+    - list_directory
+    - get_file_info
+    - search_files
+    disallowed_tools:
+    - execute_arbitrary_binary
+    - format_disk
+  fritzbox_mcp:
+    name: FRITZ!Box Network & Smart Home MCP
+    description: Inspect network devices, WAN IP status, guest Wi-Fi, and Smart Home
+      DECT devices.
+    transport: stdio
+    command: python3
+    args:
+    - "/app/scripts/mcp/fritzbox_mcp.py"
+    environment:
+      FRITZBOX_HOST: os.environ/FRITZBOX_HOST
+      FRITZBOX_PORT: os.environ/FRITZBOX_PORT
+      FRITZBOX_USER: os.environ/FRITZBOX_USER
+      FRITZBOX_PASSWORD: os.environ/FRITZBOX_PASSWORD
+      FRITZBOX_USE_SSL: os.environ/FRITZBOX_USE_SSL
+    timeout: 60
+    allowed_tools:
+    - get_fritzbox_info
+    - get_system_logs
+    - get_wan_status
+    - get_fiber_diagnostics
+    - list_network_devices
+    - get_device_details
+    - wake_on_lan
+    - get_mesh_topology
+    - get_wifi_status
+    - set_guest_wifi
+    - get_call_list
+    - get_smarthome_devices
+    - reconnect_wan
+  searxng_mcp:
+    name: SearXNG Meta-Search MCP
+    description: Privacy-focused web search, news aggregation, and academic search
+      for research agents.
+    transport: stdio
+    command: python3
+    args:
+    - "/app/scripts/mcp/searxng_mcp.py"
+    environment:
+      SEARXNG_URL: http://searxng:8080
+    timeout: 30
+    allowed_tools:
+    - search_web
+    - search_news
+    - search_scholar
+  browserless_mcp:
+    name: Browserless Headless Chromium MCP
+    description: Navigate dynamic web pages, extract DOM and rendered text, capture
+      visual screenshots.
+    transport: stdio
+    command: python3
+    args:
+    - "/app/scripts/mcp/browserless_mcp.py"
+    environment:
+      BROWSERLESS_URL: http://browserless:3000
+    timeout: 45
+    allowed_tools:
+    - get_web_content
+    - scrape_text
+    - take_screenshot
+  sandbox_mcp:
+    name: Isolated Code Execution Sandbox MCP
+    description: Execute ephemeral Python and Shell code in a secure, non-root, resource-limited
+      container.
+    transport: stdio
+    command: python3
+    args:
+    - "/app/scripts/mcp/sandbox_mcp.py"
+    environment:
+      SANDBOX_URL: http://sandbox:8088
+    timeout: 30
+    allowed_tools:
+    - execute_python
+    - execute_shell
+  docker_mcp:
+    name: Docker Container Management MCP
+    description: Inspect container states, retrieve stdout/stderr logs, and trigger
+      safe restarts.
+    transport: stdio
+    command: python3
+    args:
+    - "/app/scripts/mcp/docker_mcp.py"
+    environment:
+      DOCKER_SOCKET: "/var/run/docker.sock"
+    timeout: 45
+    allowed_tools:
+    - get_container_status
+    - get_container_logs
+    - restart_container
+  spec_mcp:
+    name: Product & Specification Management MCP
+    description: Save, list, and inspect product specifications, user stories, and
+      requirements.
+    transport: stdio
+    command: python3
+    args:
+    - "/app/scripts/mcp/spec_mcp.py"
+    environment:
+      SPECS_DIR: "/workspace/docs/specs"
+    timeout: 30
+    allowed_tools:
+    - save_specification
+    - list_specifications
+    - load_specification
+  architecture_mcp:
+    name: System Architecture Documentation MCP
+    description: Save, list, and inspect Architecture Decision Records (ADRs) and
+      system designs.
+    transport: stdio
+    command: python3
+    args:
+    - "/app/scripts/mcp/architecture_mcp.py"
+    environment:
+      ARCHITECTURE_DIR: "/workspace/docs/architecture"
+    timeout: 30
+    allowed_tools:
+    - save_architecture_doc
+    - list_architecture_docs
+    - load_architecture_doc
+  qdrant_mcp:
+    name: Qdrant Vector Knowledge Memory MCP
+    description: Semantic search and long-term memory retrieval using nomic-embed-text
+      embeddings.
+    transport: stdio
+    command: python3
+    args:
+    - "/app/scripts/mcp/qdrant_mcp.py"
+    environment:
+      QDRANT_URL: http://qdrant:6333
+      LITELLM_API_BASE: http://localhost:4000
+      LITELLM_MASTER_KEY: os.environ/LITELLM_MASTER_KEY
+      EMBEDDING_MODEL: nomic-embed-text
+    timeout: 30
+    allowed_tools:
+    - remember_knowledge
+    - recall_knowledge
+  memgraph_mcp:
+    name: Memgraph Knowledge Graph MCP
+    description: Query and mutate the live knowledge graph, map system dependencies,
+      and execute Cypher.
+    transport: stdio
+    command: python3
+    args:
+    - "/app/scripts/mcp/memgraph_mcp.py"
+    environment:
+      MEMGRAPH_BOLT_URL: bolt://memgraph:7687
+    timeout: 30
+    allowed_tools:
+    - query_graph
+    - add_graph_entity
+    - add_graph_relation
+    - get_system_dependencies
+agents:
+- agent_name: agent-po
+  litellm_params:
+    model: local-general
+    temperature: 0.2
+    max_tokens: 4096
+    tools:
+    - spec_mcp
+    - qdrant_mcp
+    - memgraph_mcp
+  tools:
+  - spec_mcp
+  - qdrant_mcp
+  - memgraph_mcp
+  agent_card_params:
+    protocolVersion: 0.1.0
+    name: Product Owner & Requirements Agent
+    description: Translates business visions into structured specifications, user
+      stories, PRDs, and acceptance criteria.
+    url: http://localhost:4000/agents/agent-po
+    version: 1.0.0
+    capabilities:
+      streaming: true
+      tools: true
+    defaultInputModes:
+    - text
+    defaultOutputModes:
+    - text
+    skills:
+    - name: Product & Specification Management
+      description: Persist, list, and inspect PRDs, user stories, and specifications
+        in /workspace/docs/specs
+    - name: Vector Memory & Retrieval
+      description: Persist and recall long-term domain knowledge and requirements
+        via Qdrant
+    - name: System Knowledge Graph
+      description: Inspect entities and relationships in the Memgraph knowledge graph
+- agent_name: agent-architect
+  litellm_params:
+    model: local-general
+    temperature: 0.1
+    max_tokens: 8192
+    tools:
+    - architecture_mcp
+    - spec_mcp
+    - qdrant_mcp
+    - memgraph_mcp
+  tools:
+  - architecture_mcp
+  - spec_mcp
+  - qdrant_mcp
+  - memgraph_mcp
+  agent_card_params:
+    protocolVersion: 0.1.0
+    name: System & Software Architect Agent
+    description: Designs system architecture, defines component boundaries, evaluates
+      specifications, and writes Architecture Decision Records (ADRs).
+    url: http://localhost:4000/agents/agent-architect
+    version: 1.0.0
+    capabilities:
+      streaming: true
+      tools: true
+    defaultInputModes:
+    - text
+    defaultOutputModes:
+    - text
+    skills:
+    - name: Architecture Documentation (ADR)
+      description: Persist, list, and evaluate system designs, component topologies,
+        and ADRs in /workspace/docs/architecture
+    - name: Specification Review
+      description: Load and inspect product specifications to produce aligned architecture
+        designs
+    - name: Vector Memory & Retrieval
+      description: Semantic search and long-term memory retrieval across technical
+        standards and patterns
+    - name: Knowledge Graph Modeling
+      description: Query and mutate service topologies, dependencies, and entity relationships
+        in Memgraph
+- agent_name: agent-coder
+  litellm_params:
+    model: local-coder
+    temperature: 0.2
+    max_tokens: 8192
+    tools:
+    - filesystem_mcp
+    - sandbox_mcp
+    - github_mcp
+    - qdrant_mcp
+  tools:
+  - filesystem_mcp
+  - sandbox_mcp
+  - github_mcp
+  - qdrant_mcp
+  agent_card_params:
+    protocolVersion: 0.1.0
+    name: Software Architecture & Code Agent
+    description: Architects software systems, writes idiomatic code, refactors codebases,
+      and performs repository audits.
+    url: http://localhost:4000/agents/agent-coder
+    version: 1.0.0
+    capabilities:
+      streaming: true
+      tools: true
+    defaultInputModes:
+    - text
+    defaultOutputModes:
+    - text
+    skills:
+    - name: Sandboxed Filesystem
+      description: Read, write, diff, and explore files inside the workspace sandbox
+    - name: Code Execution Sandbox
+      description: Safely execute, test, and benchmark Python and shell snippets in
+        an isolated runtime
+    - name: GitHub Code Navigation
+      description: Inspect commits, PRs, branches, and code repositories
+    - name: Vector Memory & Snippet Recall
+      description: Store and recall tested algorithms, reusable patterns, and technical
+        knowledge via Qdrant
+- agent_name: agent-researcher
+  litellm_params:
+    model: local-general
+    temperature: 0.3
+    max_tokens: 8192
+    tools:
+    - searxng_mcp
+    - browserless_mcp
+    - qdrant_mcp
+  tools:
+  - searxng_mcp
+  - browserless_mcp
+  - qdrant_mcp
+  agent_card_params:
+    protocolVersion: 0.1.0
+    name: Deep Research & Knowledge Agent
+    description: Performs web queries, extracts web documents, summarizes online sources,
+      and navigates dynamic web pages.
+    url: http://localhost:4000/agents/agent-researcher
+    version: 1.0.0
+    capabilities:
+      streaming: true
+      tools: true
+    defaultInputModes:
+    - text
+    defaultOutputModes:
+    - text
+    skills:
+    - name: SearXNG Meta-Search
+      description: Query privacy meta-search aggregator for web, news, and academic
+        papers without tracking
+    - name: Browserless Web Automation
+      description: Render dynamic web pages, scrape clean text, and capture screenshots
+        using headless Chromium
+    - name: Long-Term Knowledge Storage
+      description: Persist distilled research papers, web facts, and summaries into
+        vector memory via Qdrant
+- agent_name: agent-devops
+  litellm_params:
+    model: local-general
+    temperature: 0.1
+    max_tokens: 4096
+    tools:
+    - docker_mcp
+    - litellm_mcp
+    - cloudflare_mcp
+    - fritzbox_mcp
+    - qdrant_mcp
+    - memgraph_mcp
+  tools:
+  - docker_mcp
+  - litellm_mcp
+  - cloudflare_mcp
+  - fritzbox_mcp
+  - qdrant_mcp
+  - memgraph_mcp
+  agent_card_params:
+    protocolVersion: 0.1.0
+    name: DevOps & Infrastructure Automation Agent
+    description: Monitors Docker containers, inspects LiteLLM proxies, manages Cloudflare
+      networking, and handles home infrastructure.
+    url: http://localhost:4000/agents/agent-devops
+    version: 1.0.0
+    capabilities:
+      streaming: true
+      tools: true
+    defaultInputModes:
+    - text
+    defaultOutputModes:
+    - text
+    skills:
+    - name: Docker Container Management
+      description: Inspect container states, retrieve stdout/stderr logs, and trigger
+        safe restarts
+    - name: LiteLLM Gateway Management
+      description: Manage models, inspect gateway health, query router analytics,
+        and create virtual API keys
+    - name: Cloudflare DNS & Tunnels
+      description: Manage DNS records, Cloudflare Tunnels, and Zero Trust access policies
+    - name: FRITZ!Box Network & Smart Home
+      description: Inspect local network devices, WAN status, guest Wi-Fi, and smart
+        home DECT devices
+    - name: Infrastructure Knowledge Graph
+      description: Query and inspect service topologies, port mappings, and dependencies
+        in Memgraph
+    - name: Incident & Runbook Memory
+      description: Persist and retrieve incident resolutions, runbooks, and configs
+        in Qdrant
+skills:
+- skill_id: skill-code-review
+  display_title: Automated Code Review & Quality Assurance
+  description: Performs strict architectural, idiomatic, and performance code reviews
+    on diffs and PRs.
+  source: config/skills/code_review.md
+  metadata:
+    category: development
+    version: 1.0.0
+    applicable_models:
+    - local-coder
+    - smart-coder
+  instructions: |
+    You are acting as a Staff Software Engineer conducting a thorough code review.
+    When reviewing code or git diffs:
+    1. Analyze for architectural consistency, SOLID principles, and clean separation of concerns.
+    2. Detect potential concurrency bugs, memory leaks, unhandled exceptions, and type safety issues.
+    3. Verify that all public APIs have concise documentation and adequate unit test coverage.
+    4. Suggest concrete refactorings with before/after diff code blocks.
+- skill_id: skill-sec-audit
+  display_title: Security & Secret Leakage Audit
+  description: Audits configurations, code, and dependencies for OWASP Top 10, hardcoded
+    secrets, and unsafe syscalls.
+  source: config/skills/security_audit.md
+  metadata:
+    category: security
+    version: 1.0.0
+    applicable_models:
+    - local-coder
+    - local-general
+  instructions: |
+    You are a Lead Application Security Specialist.
+    When auditing code or infrastructure files:
+    1. Search for hardcoded secrets, API tokens, unencrypted private keys, and default passwords.
+    2. Check for injection vectors (SQLi, Command Injection, SSRF, XSS) and unsafe deserialization.
+    3. Verify least privilege principles on MCP and cloud credentials.
+    4. Output findings in a prioritized CVSS-style Markdown table (Critical, High, Medium, Low).
+- skill_id: skill-devops-triage
+  display_title: SRE Incident Diagnostics & Cloudflare Triage
+  description: Diagnoses infrastructure anomalies, DNS misconfigurations, Tunnel degradation,
+    and CI/CD failures.
+  source: config/skills/devops_triage.md
+  metadata:
+    category: devops
+    version: 1.0.0
+    applicable_models:
+    - local-general
+    - smart-general
+  instructions: |
+    You are a Senior Site Reliability Engineer performing root cause analysis.
+    When triaging incidents:
+    1. Query Cloudflare MCP for DNS propagation status, Tunnel health, and edge firewall events.
+    2. Inspect recent GitHub Actions run logs and failing commit diffs.
+    3. Correlate timestamps between deployment triggers and service degradation.
+    4. Provide an immediate mitigation runbook and post-mortem summary.
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+  redis_url: redis://redis:6379
+  user_url_allowed_hosts:
+  - localhost
+  - localhost:4000
+  - 127.0.0.1
+  - 127.0.0.1:4000
+  - host.containers.internal
+  - litellm-proxy
+  - llm.kruemel.cc
+  proxy_admin_ui: true
+  store_audit_logs: true
+  alerting:
+  - webhook
+  alerting_threshold: 0.85
+  webhook_url: os.environ/ALERT_WEBHOOK_URL
+litellm_settings:
+  drop_params: true
+  set_verbose: false
+  num_retries: 2
+  request_timeout: 120
+  json_logs: true
+  require_auth_for_metrics_endpoint: false
+  cache: true
+  cache_params:
+    type: redis
+    host: redis
+    port: 6379
+    namespace: litellm.cache
+    supported_call_types:
+    - completion
+    - acompletion
+    - embedding
+    - aembedding
+  success_callback:
+  - cache
+  - postgres
+  - prometheus
+  - langfuse
+  failure_callback:
+  - postgres
+  - prometheus
+  - langfuse
